@@ -1,0 +1,114 @@
+.animeGridCell {
+    -fx-background-color:black;
+    -fx-border-color: black ;
+    -fx-border-width: 2;
+
+}
+
+.animeGridCell > .label {
+    -fx-text-fill:white;
+}
+
+.animeGridCell:hover {
+    -fx-background-color: #dae7f3;
+    -fx-border-color: #d2dfea;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.mfx-button {
+    -fx-background-color: #2967e3;
+    -fx-text-fill: white;
+}
+
+.animeGridCell:hover > .label{
+    -fx-text-fill: black;
+}
+
+.mfx-text-field {
+    -fx-border-color: #2967e3;
+}
+
+.mfx-text-field .floating-text {
+    -fx-text-fill: #2967e3;
+}
+
+.navbar {
+    -fx-background-color: #2967e3;
+    /*-fx-background-insets: -1 -5 -1 -1;*/
+    /*-fx-background-radius: 0 0 10 10;*/
+}
+
+.navbar .mfx-rectangle-toggle-node {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-pref-height: 40;
+
+    -fx-font-size: 13;
+    -fx-text-fill: white;
+}
+
+.navbar .mfx-rectangle-toggle-node .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-text-fill: #2967e3;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected .selection-rectangle {
+    -fx-stroke: transparent;
+    -fx-text-fill: #2967e3;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected .mfx-font-icon {
+    -mfx-color: #2967e3;
+}
+
+.sidebar {
+    -fx-background-color: #5987ea;
+    /*-fx-background-insets: -1 -5 -1 -1;*/
+    -fx-background-radius: 0 20 20 0;
+}
+
+.sidebar .mfx-scroll-pane {
+    -fx-background-color: transparent;
+
+    -track-color: rgba(255, 255, 255, 0.3);
+    -thumb-color: white;
+    -thumb-hover-color: white;
+}
+
+.sidebar .mfx-rectangle-toggle-node {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-pref-height: 40;
+
+    -fx-font-size: 13;
+    -fx-text-fill: white;
+}
+
+.sidebar .mfx-rectangle-toggle-node .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.sidebar .mfx-rectangle-toggle-node:selected {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-text-fill: #2967e3;
+}
+
+.sidebar .mfx-rectangle-toggle-node:selected .selection-rectangle {
+    -fx-stroke: transparent;
+    -fx-text-fill: #2967e3;
+}
+
+.sidebar .mfx-rectangle-toggle-node:selected .mfx-font-icon {
+    -mfx-color: #2967e3;
+}
