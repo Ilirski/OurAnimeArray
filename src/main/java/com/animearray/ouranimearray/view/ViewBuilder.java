@@ -59,8 +59,8 @@ public class ViewBuilder implements Builder<Region> {
         // Switch between panes
         basePane.add(model.getCurrentMainPane(), new CC().grow().minWidth("30mm").hideMode(3));
         basePane.add(setupNavigationBar(searchPane, loginPane, registerPane, myListPane), new CC().dockNorth());
-        basePane.add(setupLeftSideBar(loginPane), new CC().dockWest().width("70mm").hideMode(3));
-        basePane.add(setupRightSideBar(), new CC().dockEast().width("100mm").hideMode(3));
+        basePane.add(setupLeftSideBar(loginPane), new CC().dockWest().width("15%").hideMode(3));
+        basePane.add(setupRightSideBar(), new CC().dockEast().width("20%").hideMode(3));
 
         // Don't forget to add the other panes to the basePane
         basePane.add(loginPane, new CC().grow().minWidth("30mm").hideMode(3));
@@ -162,7 +162,7 @@ public class ViewBuilder implements Builder<Region> {
 
         var toggleGroup = new ToggleGroup();
 
-        topSideBar.add(createMyListToggle(model, "mfx-menu-v3", "My List", toggleGroup), new CC().grow().sizeGroup("toggle").alignX("left"));
+        topSideBar.add(createMyListToggle(model, "mfx-menu-v3", "My List", new ToggleGroup()), new CC().grow().sizeGroup("toggle").alignX("left"));
         topSideBar.add(createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane), new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.add(createNavToggle(model, "mfx-user", "Login", toggleGroup, loginPane), new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.add(createNavToggle(model, "mfx-user", "Register", toggleGroup, registerPane), new CC().grow().sizeGroup("toggle").alignX("right"));
