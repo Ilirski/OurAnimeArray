@@ -91,13 +91,9 @@ public class DatabaseFetcher {
             animeFutures.add(animeFuture);
         }
 
-        List<Anime> collect = animeFutures.stream()
+        return animeFutures.stream()
                 .map(CompletableFuture::join) // wait for all futures to complete and collect their results into a list
                 .collect(Collectors.toList());
-
-        System.out.println("finished");
-
-        return collect;
     }
 
 
