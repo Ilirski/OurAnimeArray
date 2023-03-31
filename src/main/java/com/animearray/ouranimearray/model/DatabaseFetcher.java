@@ -1,17 +1,19 @@
 package com.animearray.ouranimearray.model;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class DatabaseFetcher {
     // Refer to https://github.com/220118-Pega/Quezon-Aldrick-Code/blob/f908d976c4d73cc98a94df137b323bc00730d2de/Zero/ProZero/src/zero/userdata/RequestDAO.java
     private static final String url = "jdbc:sqlite:C:\\Users\\User\\IdeaProjects\\OurAnimeArray\\src\\main\\java\\com\\animearray\\ouranimearray\\model\\anime.db";
-    private static final String ERROR_IMAGE_URL = "https://www.computerhope.com/jargon/e/error.png";
+    String ERROR_IMAGE_URL = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
     public List<User> getUsers() {
 
@@ -82,21 +84,27 @@ public class DatabaseFetcher {
             double score = rs.getDouble("score");
             String synopsis = rs.getString("synopsis");
 
-            CompletableFuture<Anime> animeFuture = CompletableFuture.supplyAsync(() -> { // fetch image asynchronously
-                Image image = turnUrlToImage(imageUrl);
-                return new Anime(id, title, image, episodes, score, synopsis); // create new anime object with fetched image
-            });
+            CompletableFuture<Anime> animeFuture = CompletableFuture.supplyAsync(() -> turnUrlToImage(imageUrl))
+                    .completeOnTimeout(turnUrlToImage(ERROR_IMAGE_URL), 5, TimeUnit.SECONDS)
+                    .thenApply(image -> new Anime(id, title, image, episodes, score, synopsis));
 
             animeFutures.add(animeFuture);
         }
 
-        return animeFutures.stream()
+        List<Anime> collect = animeFutures.stream()
                 .map(CompletableFuture::join) // wait for all futures to complete and collect their results into a list
                 .collect(Collectors.toList());
+
+        System.out.println("finished");
+
+        return collect;
     }
 
 
     public Image turnUrlToImage(String url) {
+        if (url == null) {
+            return new Image(ERROR_IMAGE_URL);
+        }
         return new Image(url);
     }
 }

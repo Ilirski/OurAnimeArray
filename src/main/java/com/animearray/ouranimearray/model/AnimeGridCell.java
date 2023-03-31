@@ -138,7 +138,7 @@ public class AnimeGridCell extends GridCell<Anime> {
 
         super.updateItem(item, empty);
 
-        if (empty || item.image() == null) {
+        if (empty || item == null) {
             setGraphic(null);
         } else {
             Image animePoster = item.image();

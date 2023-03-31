@@ -13,6 +13,7 @@ module com.animearray.ouranimearray {
     requires java.sql;
     requires sqlite.jdbc;
     requires com.tobiasdiez.easybind;
+//    requires jdk.incubator.concurrent; // Java 19 Virtual Threads
 
     opens com.animearray.ouranimearray to javafx.fxml;
     exports com.animearray.ouranimearray;
