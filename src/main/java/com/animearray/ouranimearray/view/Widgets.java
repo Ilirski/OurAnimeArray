@@ -12,9 +12,11 @@ import io.github.palexdev.materialfx.font.MFXFontIcon;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -26,13 +28,48 @@ import java.util.function.Consumer;
 import static io.github.palexdev.materialfx.utils.StringUtils.containsAny;
 
 public class Widgets {
-    static MFXPasswordField createPasswordField(Label validationLabel) {
+
+    static MFXTextField createRegisterUsernameField(Label validationLabel) {
+        var usernameField = new MFXTextField();
+        final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
+        usernameField.getStyleClass().add("validatedField");
+        usernameField.setFloatingText("Username");
+
+        Constraint lengthConstraint = Constraint.Builder.build()
+                .setSeverity(Severity.ERROR)
+                .setMessage("Username must be at least 5 characters long")
+                .setCondition(usernameField.textProperty().length().greaterThanOrEqualTo(5))
+                .get();
+
+        usernameField.getValidator()
+                .constraint(lengthConstraint);
+
+        usernameField.getValidator().validProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                validationLabel.setVisible(false);
+                usernameField.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
+            }
+        });
+
+        usernameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            List<Constraint> constraints = usernameField.validate();
+            if (!constraints.isEmpty()) {
+                usernameField.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, true);
+                validationLabel.setText(constraints.get(0).getMessage());
+                validationLabel.setVisible(true);
+            }});
+
+
+
+        return usernameField;
+    }
+    static MFXPasswordField createRegisterPasswordField(Label validationLabel) {
         var passwordField = new MFXPasswordField();
         final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
+        passwordField.getStyleClass().add("validatedField");
         final String[] upperChar = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split(" ");
         final String[] lowerChar = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(" ");
         final String[] digits = "0 1 2 3 4 5 6 7 8 9".split(" ");
-        final String[] specialCharacters = "! @ # & ( ) – [ { } ]: ; ' , ? / * ~ $ ^ + = < > -".split(" ");
 
         passwordField.setFloatingText("Password");
 
@@ -61,20 +98,11 @@ public class Widgets {
                 ))
                 .get();
 
-        Constraint specialCharactersConstraint = Constraint.Builder.build()
-                .setSeverity(Severity.ERROR)
-                .setMessage("Password must contain at least one special character")
-                .setCondition(Bindings.createBooleanBinding(
-                        () -> containsAny(passwordField.getText(), "", specialCharacters),
-                        passwordField.textProperty()
-                ))
-                .get();
-
         passwordField.getValidator()
                 .constraint(digitConstraint)
                 .constraint(charactersConstraint)
-                .constraint(specialCharactersConstraint)
                 .constraint(lengthConstraint);
+
 
         passwordField.getValidator().validProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {

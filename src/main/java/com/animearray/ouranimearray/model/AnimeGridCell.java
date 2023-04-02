@@ -14,6 +14,7 @@ import net.miginfocom.layout.LC;
 import org.controlsfx.control.GridCell;
 import org.tbee.javafx.scene.layout.MigPane;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.animearray.ouranimearray.model.MouseClickNotDragDetector.clickNotDragDetectingOn;
@@ -51,6 +52,7 @@ public class AnimeGridCell extends GridCell<Anime> {
                         this.getScene().setCursor(Cursor.DEFAULT);
                     }
 
+                    // Item can be null
                     Anime item = getItem();
                     if (item != null) {
                         model.setAnime(item);
@@ -61,6 +63,7 @@ public class AnimeGridCell extends GridCell<Anime> {
                 });
 
         // https://stackoverflow.com/questions/26610660/how-to-drag-a-javafx-node-and-detect-a-drop-event-outside-the-javafx-windows
+
         setOnDragDetected(event -> {
             getScene().setCursor(Cursor.CLOSED_HAND);
             startFullDrag();

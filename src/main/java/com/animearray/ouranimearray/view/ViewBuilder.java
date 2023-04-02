@@ -4,10 +4,21 @@ import animatefx.animation.SlideInUp;
 import com.animearray.ouranimearray.model.Anime;
 import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
+import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableSet;
+import javafx.css.PseudoClass;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -107,23 +118,37 @@ public class ViewBuilder implements Builder<Region> {
                 new LC().align("center", "center")
         );
 
-        var usernameField = new MFXTextField();
         var validationLabel = new Label();
+        validationLabel.getStyleClass().add("validationLabel");
         validationLabel.setWrapText(true);
         validationLabel.setTextAlignment(TextAlignment.CENTER);
-        MFXPasswordField passwordField = Widgets.createPasswordField(validationLabel);
 
+        var usernameField = createRegisterUsernameField(validationLabel);
         usernameField.setFloatingText("Username");
-        usernameField.getValidator().constraint("The username must be at least 6 characters long", usernameField.textProperty().length().greaterThanOrEqualTo(6));
+        MFXPasswordField passwordField = Widgets.createRegisterPasswordField(validationLabel);
 
 
         MFXButton registerButton = new MFXButton("Register");
+        registerButton.setDisable(true);
 
-//        registerButton.disableProperty().bind();
+        var isInvalid = Bindings.createBooleanBinding(
+                () -> passwordField.getPseudoClassStates().stream()
+                        .anyMatch(pseudoClass -> pseudoClass.getPseudoClassName().equals("invalid")),
+                passwordField.getPseudoClassStates());
+
+        BooleanProperty isFetchingUser = new SimpleBooleanProperty(false);
+
+//        // Combine the isInvalid and isFetchingUser properties
+//        // Always disable, unless it is valid.
+//        var disableRegisterButton = Bindings.createBooleanBinding(
+//                () -> isInvalid.get() || isFetchingUser.get(),
+//                isInvalid, isFetchingUser);
+
+        registerButton.disableProperty().bind(isInvalid.or(isFetchingUser).or(passwordField.textProperty().isEmpty()));
 
         registerButton.setOnAction(event -> {
-            registerButton.setDisable(true);
-            userFetcher.accept(() -> registerButton.setDisable(false));
+            isFetchingUser.set(true);
+            userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
         registerPane.add(usernameField, new CC().wrap().sizeGroup("login").grow().width("100mm"));

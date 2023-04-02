@@ -26,7 +26,7 @@
 }
 
 .mfx-text-field {
-    -fx-border-color: #2967e3;
+    -mfx-main: #2967e3;
 }
 
 .mfx-text-field .floating-text {
@@ -111,4 +111,24 @@
 
 .sidebar .mfx-rectangle-toggle-node:selected .mfx-font-icon {
     -mfx-color: #2967e3;
+}
+
+
+/* Text boxes*/
+
+.validatedField:invalid {
+    -fx-border-color: -mfx-red;
+}
+
+.validatedField:invalid .floating-text {
+    -fx-text-fill: -mfx-red;
+}
+
+.validatedField:invalid .mfx-font-icon {
+    -mfx-color: -mfx-red;
+}
+
+.validationLabel {
+    -fx-font-family: 'Visby Round CF Demi Bold';
+    -fx-font-size: 11;
 }

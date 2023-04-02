@@ -31,7 +31,6 @@ public class Controller {
             }
         };
         fetchTask.setOnSucceeded(event -> {
-            System.out.println("Success!");
             interactor.updateAnimeList();
             postFetchAnimeList.run();
         });

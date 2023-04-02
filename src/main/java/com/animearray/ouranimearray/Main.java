@@ -22,7 +22,9 @@ public class Main extends Application {
         Scene scene = new Scene(new Controller().getViewBuilder(), 1200, 600);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet.css")).toExternalForm());
         stage.setScene(scene);
-//        stage.getIcons().add(new Image("com/animearray/ouranimearray/icons/rimuru-thumbnail.jpg"));
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/rimuru-thumbnail.jpg")).toString()));
+        System.out.println("javafx.runtime.version: " + System.getProperty("javafx.runtime.version"));
+        System.out.println("JavaFX Version: " + System.getProperty("javafx.version"));
 
         // Don't forget to remove below!!
         CSSFX.start();

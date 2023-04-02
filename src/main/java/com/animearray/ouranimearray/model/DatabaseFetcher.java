@@ -6,6 +6,7 @@ import javafx.scene.image.ImageView;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -15,6 +16,28 @@ public class DatabaseFetcher {
     private static final String url = "jdbc:sqlite:C:\\Users\\User\\IdeaProjects\\OurAnimeArray\\src\\main\\java\\com\\animearray\\ouranimearray\\model\\anime.db";
     String ERROR_IMAGE_URL = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
+    public Optional<String> getUser(String username, String password) {
+        String sql = "SELECT id, * FROM user WHERE username = ? AND password = ?";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery(sql)) {
+            ps.setString(0, username);
+            ps.setString(1, password);
+            if (rs.next()) {
+                String id = rs.getString("id");
+                return Optional.of(id);
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        throw new RuntimeException("Problem with SQL fetching");
+    }
+
     public List<User> getUsers() {
 
         List<User> users = new ArrayList<>();
@@ -23,7 +46,7 @@ public class DatabaseFetcher {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT id, * FROM user LIMIT 30")) {
             while (rs.next()) {
-                int id = rs.getInt("id");
+                String id = rs.getString("id");
                 String username = rs.getString("username");
                 String password = rs.getString("password");
 
@@ -35,8 +58,7 @@ public class DatabaseFetcher {
             System.out.println(e.getMessage());
         }
 
-        System.out.println(" i should not be calld");
-        return List.of(new User(0, "", ""));
+        throw new RuntimeException("Problem with SQL fetching");
     }
 
 
@@ -51,30 +73,28 @@ public class DatabaseFetcher {
             System.out.println(e.getMessage());
         }
 
-        return List.of(new Anime("0", "", new Image(ERROR_IMAGE_URL), 0, 0f, ""));
+        throw new RuntimeException("Problem with SQL fetching");
     }
 
     public List<Anime> searchAnime(String query) {
         String sql = "SELECT rowid, * FROM anime WHERE title LIKE ? ORDER BY score DESC LIMIT 30";
 
         try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + query + "%"); // add wildcards for fuzzy search
 
-            stmt.setString(1, "%" + query + "%"); // add wildcards for fuzzy search
-
-            ResultSet rs = stmt.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             return getAnime(rs);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
-        System.out.println("I shouldn't be called");
-        return List.of(new Anime("0", "", new Image(ERROR_IMAGE_URL), 0, 0f, ""));
+        throw new RuntimeException("Problem with SQL fetching");
     }
 
     private List<Anime> getAnime(ResultSet rs) throws SQLException {
-        List<CompletableFuture<Anime>> animeFutures = new ArrayList<>(); // list of future anime objects
+        List<CompletableFuture<Anime>> animeFutures = new ArrayList<>();
 
         while (rs.next()) {
             String id = rs.getString("rowid");
