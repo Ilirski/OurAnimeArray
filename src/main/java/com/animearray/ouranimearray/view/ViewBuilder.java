@@ -18,7 +18,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
 import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -49,13 +51,13 @@ public class ViewBuilder implements Builder<Region> {
     @Override
     public Region build() {
         MigPane basePane = new MigPane(new LC().fill(), new AC().grow(), new AC().grow());
-
-        // Very important, do not change!!!
         basePane.setId("basePane");
+
+        // Setup panes
         MigPane searchPane = setupSearchPane(animeFetcher);
         MigPane loginPane = setupLoginPane(userFetcher);
         MigPane registerPane = setupRegisterPane(userFetcher);
-        MigPane myListPane = setupMyListPane(userFetcher);
+        MigPane loginRegisterPane = setupLoginRegisterPane(loginPane, registerPane, userFetcher);
 
         // User sees search pane on startup
         model.currentMainPaneProperty().set(searchPane);
@@ -69,16 +71,47 @@ public class ViewBuilder implements Builder<Region> {
 
         // Switch between panes
         basePane.add(model.getCurrentMainPane(), new CC().grow().minWidth("30mm").hideMode(3));
-        basePane.add(setupNavigationBar(searchPane, loginPane, registerPane, myListPane), new CC().dockNorth());
+
+        basePane.add(setupNavigationBar(searchPane, loginRegisterPane), new CC().dockNorth());
         basePane.add(setupLeftSideBar(loginPane), new CC().dockWest().width("15%").hideMode(3));
         basePane.add(setupRightSideBar(), new CC().dockEast().width("20%").hideMode(3));
 
         // Don't forget to add the other panes to the basePane
-        basePane.add(loginPane, new CC().grow().minWidth("30mm").hideMode(3));
-        basePane.add(registerPane, new CC().grow().minWidth("30mm").hideMode(3));
-
+        basePane.add(loginRegisterPane, new CC().grow().minWidth("30mm").hideMode(3));
 
         return basePane;
+    }
+
+    private MigPane setupLoginRegisterPane(MigPane loginPane, MigPane registerPane, Consumer<Runnable> userFetcher) {
+        var loginRegisterPane = new MigPane(
+                new LC().align("center", "center")
+        );
+
+        loginRegisterPane.add(loginPane, new CC().hideMode(3));
+        loginRegisterPane.add(registerPane, new CC().hideMode(3));
+
+        var registerPaneLink = new Hyperlink("Already have an account?");
+        registerPaneLink.setTextAlignment(TextAlignment.CENTER);
+        registerPaneLink.setAlignment(Pos.CENTER);
+        registerPaneLink.setOnAction(event -> {
+            loginPane.setVisible(false);
+            registerPane.setVisible(true);
+        });
+        loginPane.add(registerPaneLink, new CC().grow());
+
+        var loginPaneLink = new Hyperlink("Don't have an account?");
+        loginPaneLink.setTextAlignment(TextAlignment.CENTER);
+        loginPaneLink.setAlignment(Pos.CENTER);
+        loginPaneLink.setOnAction(event -> {
+            registerPane.setVisible(false);
+            loginPane.setVisible(true);
+        });
+        registerPane.add(loginPaneLink, new CC().grow());
+
+
+        loginPane.setVisible(true);
+        loginRegisterPane.setVisible(false);
+        return loginRegisterPane;
     }
 
     private MigPane setupMyListPane(Consumer<Runnable> userFetcher) {
@@ -91,7 +124,7 @@ public class ViewBuilder implements Builder<Region> {
 
     private MigPane setupLoginPane(Consumer<Runnable> userFetcher) {
         MigPane loginPane = new MigPane(
-                new LC().align("center", "center")
+                new LC().align("center", "center").wrap()
         );
 
         MFXTextField usernameField = new MFXTextField();
@@ -105,9 +138,11 @@ public class ViewBuilder implements Builder<Region> {
             userFetcher.accept(() -> loginButton.setDisable(false));
         });
 
-        loginPane.add(usernameField, new CC().wrap().sizeGroup("login").grow().width("100mm"));
-        loginPane.add(passwordField, new CC().wrap().sizeGroup("login").grow());
-        loginPane.add(loginButton, new CC().wrap().grow());
+
+        loginPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
+        loginPane.add(passwordField, new CC().sizeGroup("login").grow());
+        loginPane.add(loginButton, new CC().grow());
+
 
         loginPane.setVisible(false);
         return loginPane;
@@ -115,7 +150,7 @@ public class ViewBuilder implements Builder<Region> {
 
     private MigPane setupRegisterPane(Consumer<Runnable> userFetcher) {
         MigPane registerPane = new MigPane(
-                new LC().align("center", "center")
+                new LC().align("center", "center").wrap()
         );
 
         var validationLabel = new Label();
@@ -126,7 +161,6 @@ public class ViewBuilder implements Builder<Region> {
         var usernameField = createRegisterUsernameField(validationLabel);
         usernameField.setFloatingText("Username");
         MFXPasswordField passwordField = Widgets.createRegisterPasswordField(validationLabel);
-
 
         MFXButton registerButton = new MFXButton("Register");
         registerButton.setDisable(true);
@@ -151,9 +185,9 @@ public class ViewBuilder implements Builder<Region> {
             userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
-        registerPane.add(usernameField, new CC().wrap().sizeGroup("login").grow().width("100mm"));
-        registerPane.add(passwordField, new CC().wrap().sizeGroup("login").grow());
-        registerPane.add(registerButton, new CC().grow().wrap());
+        registerPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
+        registerPane.add(passwordField, new CC().sizeGroup("login").grow());
+        registerPane.add(registerButton, new CC().grow());
         registerPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center"));
 
         registerPane.setVisible(false);
@@ -178,7 +212,7 @@ public class ViewBuilder implements Builder<Region> {
         return searchPane;
     }
 
-    private MigPane setupNavigationBar(MigPane searchPane, MigPane loginPane, MigPane registerPane, MigPane myListPane) {
+    private MigPane setupNavigationBar(MigPane searchPane, MigPane loginRegisterPane) {
         MigPane topSideBar = new MigPane(
                 new LC(),
                 new AC().gap("push", 0)
@@ -189,8 +223,7 @@ public class ViewBuilder implements Builder<Region> {
 
         topSideBar.add(createMyListToggle(model, "mfx-menu-v3", "My List", new ToggleGroup()), new CC().grow().sizeGroup("toggle").alignX("left"));
         topSideBar.add(createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane), new CC().grow().sizeGroup("toggle").alignX("right"));
-        topSideBar.add(createNavToggle(model, "mfx-user", "Login", toggleGroup, loginPane), new CC().grow().sizeGroup("toggle").alignX("right"));
-        topSideBar.add(createNavToggle(model, "mfx-user", "Register", toggleGroup, registerPane), new CC().grow().sizeGroup("toggle").alignX("right"));
+        topSideBar.add(createNavToggle(model, "mfx-user", "Login / Register", toggleGroup, loginRegisterPane), new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.getStyleClass().add("navbar");
 
         return topSideBar;

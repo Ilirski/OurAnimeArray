@@ -10,7 +10,6 @@ public class Model {
     private final ListProperty<Anime> animeList = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty leftSideBarVisible = new SimpleBooleanProperty(false);
-    private final BooleanProperty registrationPossible = new SimpleBooleanProperty(false);
     private final ObjectProperty<MigPane> currentMainPane = new SimpleObjectProperty<>();
     private final SimpleAnimeProperty anime = new SimpleAnimeProperty();
     private final StringProperty searchQuery = new SimpleStringProperty("");
