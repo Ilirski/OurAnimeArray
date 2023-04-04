@@ -6,6 +6,7 @@ import com.animearray.ouranimearray.model.Model;
 import com.animearray.ouranimearray.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AnimeInteractor {
     private final Model viewModel;
@@ -23,6 +24,12 @@ public class AnimeInteractor {
     }
 
     public void getUser() {
+        Optional<String> user = databaseFetcher.getUser(viewModel.getUsername(), viewModel.getPassword());
+        viewModel.setCurrentUserID(user.orElse(""));
+    }
+
+
+    public void getUsers() {
         List<User> users = databaseFetcher.getUsers();
         System.out.println(users);
     }

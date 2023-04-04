@@ -1,5 +1,7 @@
 package com.animearray.ouranimearray.model;
 
+import com.tobiasdiez.easybind.EasyBind;
+import javafx.beans.binding.Binding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +15,50 @@ public class Model {
     private final ObjectProperty<MigPane> currentMainPane = new SimpleObjectProperty<>();
     private final SimpleAnimeProperty anime = new SimpleAnimeProperty();
     private final StringProperty searchQuery = new SimpleStringProperty("");
+    private final StringProperty currentUserID = new SimpleStringProperty("");
+    private final Binding<Boolean> isLoggedIn = EasyBind.wrap(currentUserID).map(String::isBlank);
+    private final StringProperty username = new SimpleStringProperty("");
+    private final StringProperty password = new SimpleStringProperty("");
+
+    public Binding<Boolean> isLoggedInProperty() {
+        return isLoggedIn;
+    }
+
+    public String getCurrentUserID() {
+        return currentUserID.get();
+    }
+
+    public void setCurrentUserID(String currentUserID) {
+        this.currentUserID.set(currentUserID);
+    }
+
+    public StringProperty currentUserIDProperty() {
+        return currentUserID;
+    }
+
+    public String getUsername() {
+        return username.get();
+    }
+
+    public void setUsername(String username) {
+        this.username.set(username);
+    }
+
+    public StringProperty usernameProperty() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password.get();
+    }
+
+    public void setPassword(String password) {
+        this.password.set(password);
+    }
+
+    public StringProperty passwordProperty() {
+        return password;
+    }
 
     public boolean isLeftSideBarVisible() {
         return leftSideBarVisible.get();

@@ -4,22 +4,14 @@ import animatefx.animation.SlideInUp;
 import com.animearray.ouranimearray.model.Anime;
 import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
-import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableSet;
-import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
@@ -97,6 +89,7 @@ public class ViewBuilder implements Builder<Region> {
             loginPane.setVisible(false);
             registerPane.setVisible(true);
         });
+
         loginPane.add(registerPaneLink, new CC().grow());
 
         var loginPaneLink = new Hyperlink("Don't have an account?");
@@ -107,7 +100,6 @@ public class ViewBuilder implements Builder<Region> {
             loginPane.setVisible(true);
         });
         registerPane.add(loginPaneLink, new CC().grow());
-
 
         loginPane.setVisible(true);
         loginRegisterPane.setVisible(false);
@@ -129,8 +121,11 @@ public class ViewBuilder implements Builder<Region> {
 
         MFXTextField usernameField = new MFXTextField();
         usernameField.setFloatingText("Username");
+        usernameField.textProperty().bindBidirectional(model.usernameProperty());
         MFXPasswordField passwordField = new MFXPasswordField();
         passwordField.setFloatingText("Password");
+        passwordField.textProperty().bindBidirectional(model.passwordProperty());
+
         MFXButton loginButton = new MFXButton("Login");
 
         loginButton.setOnAction(event -> {
@@ -157,6 +152,7 @@ public class ViewBuilder implements Builder<Region> {
         validationLabel.getStyleClass().add("validationLabel");
         validationLabel.setWrapText(true);
         validationLabel.setTextAlignment(TextAlignment.CENTER);
+        validationLabel.setVisible(false);
 
         var usernameField = createRegisterUsernameField(validationLabel);
         usernameField.setFloatingText("Username");
@@ -165,6 +161,7 @@ public class ViewBuilder implements Builder<Region> {
         MFXButton registerButton = new MFXButton("Register");
         registerButton.setDisable(true);
 
+        // Check if passwordField has PseudoClass named invalid
         var isInvalid = Bindings.createBooleanBinding(
                 () -> passwordField.getPseudoClassStates().stream()
                         .anyMatch(pseudoClass -> pseudoClass.getPseudoClassName().equals("invalid")),
@@ -188,7 +185,7 @@ public class ViewBuilder implements Builder<Region> {
         registerPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
         registerPane.add(passwordField, new CC().sizeGroup("login").grow());
         registerPane.add(registerButton, new CC().grow());
-        registerPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center"));
+        registerPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center").hideMode(3));
 
         registerPane.setVisible(false);
         return registerPane;
@@ -216,15 +213,21 @@ public class ViewBuilder implements Builder<Region> {
         MigPane topSideBar = new MigPane(
                 new LC(),
                 new AC().gap("push", 0)
-
         );
 
         var toggleGroup = new ToggleGroup();
+        // Ensure one toggle is always selected
+        toggleGroup.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+            if (newVal == null)
+                oldVal.setSelected(true);
+        });
 
         topSideBar.add(createMyListToggle(model, "mfx-menu-v3", "My List", new ToggleGroup()), new CC().grow().sizeGroup("toggle").alignX("left"));
         topSideBar.add(createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane), new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.add(createNavToggle(model, "mfx-user", "Login / Register", toggleGroup, loginRegisterPane), new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.getStyleClass().add("navbar");
+
+        model.isLoggedInProperty().addListener(observable -> System.out.println("hi"));
 
         return topSideBar;
     }
@@ -233,7 +236,7 @@ public class ViewBuilder implements Builder<Region> {
         MigPane rightSideBar = new MigPane(
                 new LC().insets("0").fillX(),
                 new AC().align("center")
-                );
+        );
 
         double targetWidth = 225;
         double targetHeight = 350;

@@ -13,7 +13,7 @@ public class Controller {
     public Controller() {
         Model viewModel = new Model();
         interactor = new AnimeInteractor(viewModel);
-        viewBuilder = new ViewBuilder(viewModel, this::fetchAnimeList, this::fetchUsers);
+        viewBuilder = new ViewBuilder(viewModel, this::fetchAnimeList, this::verifyUser);
 
         // Setup default view
         interactor.searchAnime();
@@ -38,7 +38,7 @@ public class Controller {
         fetchThread.start();
     }
 
-    private void fetchUsers(Runnable postFetchUsers) {
+    private void verifyUser(Runnable postFetchUsers) {
         Task<Void> fetchTask = new Task<>() {
             @Override
             protected Void call() throws Exception {

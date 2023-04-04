@@ -17,19 +17,29 @@ public class DatabaseFetcher {
     String ERROR_IMAGE_URL = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
     public Optional<String> getUser(String username, String password) {
-        String sql = "SELECT id, * FROM user WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM user WHERE username = ? AND password = ? LIMIT 1";
 
         try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery(sql)) {
-            ps.setString(0, username);
-            ps.setString(1, password);
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
                 String id = rs.getString("id");
                 return Optional.of(id);
             } else {
                 return Optional.empty();
             }
+
+//            if (rs.next()) {
+//                String id = rs.getString("id");
+//                System.out.println(id);
+//                return Optional.of(id);
+//            } else {
+//                return Optional.empty();
+//            }
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());

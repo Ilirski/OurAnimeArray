@@ -12,11 +12,9 @@ import io.github.palexdev.materialfx.font.MFXFontIcon;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -164,7 +162,6 @@ public class Widgets {
         toggleNode.setOnMouseDragEntered(event -> {
             toggleNode.getScene().setCursor(Cursor.OPEN_HAND);
             new Wobble(toggleNode).play();
-            var hi = (AnimeGridCell) event.getGestureSource();
         });
 
         return toggleNode;
@@ -189,6 +186,7 @@ public class Widgets {
         toggleNode.setAlignment(Pos.CENTER_LEFT);
         toggleNode.setMaxWidth(Double.MAX_VALUE);
         toggleNode.setToggleGroup(toggleGroup);
+
         toggleNode.setOnAction(event -> {
             model.setCurrentMainPane(paneToSwitch);
             model.setLeftSideBarVisible(false);
