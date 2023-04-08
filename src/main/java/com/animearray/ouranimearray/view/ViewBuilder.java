@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.view;
 
-import animatefx.animation.SlideInUp;
+import animatefx.animation.*;
 import com.animearray.ouranimearray.model.Anime;
 import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
@@ -26,6 +26,7 @@ import org.controlsfx.control.GridView;
 import org.tbee.javafx.scene.layout.MigPane;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.animearray.ouranimearray.view.Widgets.*;
 
@@ -33,11 +34,13 @@ public class ViewBuilder implements Builder<Region> {
     private final Model model;
     private final Consumer<Runnable> animeFetcher;
     private final Consumer<Runnable> userFetcher;
+    private final Consumer<Runnable> userRegister;
 
-    public ViewBuilder(Model model, Consumer<Runnable> animeFetcher, Consumer<Runnable> userFetcher) {
+    public ViewBuilder(Model model, Consumer<Runnable> animeFetcher, Consumer<Runnable> userFetcher, Consumer<Runnable> userRegister) {
         this.model = model;
         this.animeFetcher = animeFetcher;
         this.userFetcher = userFetcher;
+        this.userRegister = userRegister;
     }
 
     @Override
@@ -48,8 +51,8 @@ public class ViewBuilder implements Builder<Region> {
         // Setup panes
         MigPane searchPane = setupSearchPane(animeFetcher);
         MigPane loginPane = setupLoginPane(userFetcher);
-        MigPane registerPane = setupRegisterPane(userFetcher);
-        MigPane loginRegisterPane = setupLoginRegisterPane(loginPane, registerPane, userFetcher);
+        MigPane registerPane = setupRegisterPane(userRegister);
+        MigPane loginRegisterPane = setupLoginRegisterPane(loginPane, registerPane);
 
         // User sees search pane on startup
         model.currentMainPaneProperty().set(searchPane);
@@ -74,7 +77,7 @@ public class ViewBuilder implements Builder<Region> {
         return basePane;
     }
 
-    private MigPane setupLoginRegisterPane(MigPane loginPane, MigPane registerPane, Consumer<Runnable> userFetcher) {
+    private MigPane setupLoginRegisterPane(MigPane loginPane, MigPane registerPane) {
         var loginRegisterPane = new MigPane(
                 new LC().align("center", "center")
         );
@@ -88,6 +91,7 @@ public class ViewBuilder implements Builder<Region> {
         registerPaneLink.setOnAction(event -> {
             loginPane.setVisible(false);
             registerPane.setVisible(true);
+            new FadeIn(registerPane).play();
         });
 
         loginPane.add(registerPaneLink, new CC().grow());
@@ -98,6 +102,7 @@ public class ViewBuilder implements Builder<Region> {
         loginPaneLink.setOnAction(event -> {
             registerPane.setVisible(false);
             loginPane.setVisible(true);
+            new FadeIn(loginPane).play();
         });
         registerPane.add(loginPaneLink, new CC().grow());
 
@@ -122,15 +127,24 @@ public class ViewBuilder implements Builder<Region> {
         MFXTextField usernameField = new MFXTextField();
         usernameField.setFloatingText("Username");
         usernameField.textProperty().bindBidirectional(model.usernameProperty());
+
         MFXPasswordField passwordField = new MFXPasswordField();
         passwordField.setFloatingText("Password");
         passwordField.textProperty().bindBidirectional(model.passwordProperty());
 
         MFXButton loginButton = new MFXButton("Login");
 
+        BooleanProperty isFetchingUser = new SimpleBooleanProperty(false);
+
+        var disableRegisterButtonBinding = Bindings.createBooleanBinding(
+                () -> isFetchingUser.get() || (passwordField.textProperty().isEmpty().get() || usernameField.textProperty().isEmpty().get()),
+                isFetchingUser, passwordField.textProperty(), usernameField.textProperty());
+
+        loginButton.disableProperty().bind(disableRegisterButtonBinding);
+
         loginButton.setOnAction(event -> {
-            loginButton.setDisable(true);
-            userFetcher.accept(() -> loginButton.setDisable(false));
+            isFetchingUser.set(true);
+            userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
 
@@ -169,13 +183,12 @@ public class ViewBuilder implements Builder<Region> {
 
         BooleanProperty isFetchingUser = new SimpleBooleanProperty(false);
 
-//        // Combine the isInvalid and isFetchingUser properties
-//        // Always disable, unless it is valid.
-//        var disableRegisterButton = Bindings.createBooleanBinding(
-//                () -> isInvalid.get() || isFetchingUser.get(),
-//                isInvalid, isFetchingUser);
+        var disableRegisterButtonBinding = Bindings.createBooleanBinding(
+                () -> isInvalid.get() && isFetchingUser.get()
+                        || (passwordField.textProperty().isEmpty().get() || usernameField.textProperty().isEmpty().get()),
+                isInvalid, isFetchingUser, passwordField.textProperty(), usernameField.textProperty());
 
-        registerButton.disableProperty().bind(isInvalid.or(isFetchingUser).or(passwordField.textProperty().isEmpty()));
+        registerButton.disableProperty().bind(disableRegisterButtonBinding);
 
         registerButton.setOnAction(event -> {
             isFetchingUser.set(true);
@@ -287,4 +300,3 @@ public class ViewBuilder implements Builder<Region> {
         return leftSideBar;
     }
 }
-

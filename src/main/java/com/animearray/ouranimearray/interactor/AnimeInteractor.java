@@ -23,9 +23,16 @@ public class AnimeInteractor {
         animeListData = databaseFetcher.searchAnime(searchQuery);
     }
 
+    public void registerUser() {
+        databaseFetcher.createUser(viewModel.getUsername(), viewModel.getPassword());
+        System.out.println("User created");
+    }
+
     public void getUser() {
         Optional<String> user = databaseFetcher.getUser(viewModel.getUsername(), viewModel.getPassword());
+        // Set userid to empty if user not found
         viewModel.setCurrentUserID(user.orElse(""));
+        System.out.println(user);
     }
 
 

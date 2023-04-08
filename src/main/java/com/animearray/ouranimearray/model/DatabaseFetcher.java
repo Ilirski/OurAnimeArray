@@ -33,13 +33,22 @@ public class DatabaseFetcher {
                 return Optional.empty();
             }
 
-//            if (rs.next()) {
-//                String id = rs.getString("id");
-//                System.out.println(id);
-//                return Optional.of(id);
-//            } else {
-//                return Optional.empty();
-//            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        throw new RuntimeException("Problem with SQL fetching");
+    }
+
+    public void createUser(String username, String password) {
+        String sql = "INSERT INTO user(username, password) VALUES (?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());

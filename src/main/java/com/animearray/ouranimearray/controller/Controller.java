@@ -13,7 +13,7 @@ public class Controller {
     public Controller() {
         Model viewModel = new Model();
         interactor = new AnimeInteractor(viewModel);
-        viewBuilder = new ViewBuilder(viewModel, this::fetchAnimeList, this::verifyUser);
+        viewBuilder = new ViewBuilder(viewModel, this::fetchAnimeList, this::verifyUser, this::registerUser);
 
         // Setup default view
         interactor.searchAnime();
@@ -52,6 +52,23 @@ public class Controller {
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
     }
+
+    private void registerUser(Runnable postFetchUsers) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                interactor.registerUser();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            postFetchUsers.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
+
 
     public Region getViewBuilder() { return viewBuilder.build(); }
 }
