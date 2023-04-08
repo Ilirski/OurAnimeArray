@@ -16,9 +16,35 @@ public class Model {
     private final SimpleAnimeProperty anime = new SimpleAnimeProperty();
     private final StringProperty searchQuery = new SimpleStringProperty("");
     private final StringProperty currentUserID = new SimpleStringProperty("");
-    private final Binding<Boolean> isLoggedIn = EasyBind.wrap(currentUserID).map(String::isBlank);
-    private final StringProperty username = new SimpleStringProperty("");
-    private final StringProperty password = new SimpleStringProperty("");
+    private final StringProperty usernameRegister = new SimpleStringProperty("");
+    private final StringProperty passwordRegister = new SimpleStringProperty("");
+    private final StringProperty usernameLogin = new SimpleStringProperty("");
+    private final StringProperty passwordLogin = new SimpleStringProperty("");
+    private final Binding<Boolean> isLoggedIn = EasyBind.wrap(currentUserID).map(String::isBlank).map(Boolean.FALSE::equals);
+
+    public String getUsernameLogin() {
+        return usernameLogin.get();
+    }
+
+    public void setUsernameLogin(String usernameLogin) {
+        this.usernameLogin.set(usernameLogin);
+    }
+
+    public StringProperty usernameLoginProperty() {
+        return usernameLogin;
+    }
+
+    public String getPasswordLogin() {
+        return passwordLogin.get();
+    }
+
+    public void setPasswordLogin(String passwordLogin) {
+        this.passwordLogin.set(passwordLogin);
+    }
+
+    public StringProperty passwordLoginProperty() {
+        return passwordLogin;
+    }
 
     public Binding<Boolean> isLoggedInProperty() {
         return isLoggedIn;
@@ -36,28 +62,28 @@ public class Model {
         return currentUserID;
     }
 
-    public String getUsername() {
-        return username.get();
+    public String getUsernameRegister() {
+        return usernameRegister.get();
     }
 
-    public void setUsername(String username) {
-        this.username.set(username);
+    public void setUsernameRegister(String usernameRegister) {
+        this.usernameRegister.set(usernameRegister);
     }
 
-    public StringProperty usernameProperty() {
-        return username;
+    public StringProperty usernameRegisterProperty() {
+        return usernameRegister;
     }
 
-    public String getPassword() {
-        return password.get();
+    public String getPasswordRegister() {
+        return passwordRegister.get();
     }
 
-    public void setPassword(String password) {
-        this.password.set(password);
+    public void setPasswordRegister(String passwordRegister) {
+        this.passwordRegister.set(passwordRegister);
     }
 
-    public StringProperty passwordProperty() {
-        return password;
+    public StringProperty passwordRegisterProperty() {
+        return passwordRegister;
     }
 
     public boolean isLeftSideBarVisible() {

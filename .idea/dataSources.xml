@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="anime.db" uuid="c84d4ad7-7284-42a8-9a18-4b8867ba22f8">
+    <data-source source="LOCAL" name="anime.db" uuid="c8dcb439-9558-47c0-a4a8-00e5475d3246">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/Downloads/anime-db-master/anime-db-master/anime.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/src/main/java/com/animearray/ouranimearray/model/anime.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

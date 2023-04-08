@@ -49,6 +49,7 @@ public class DatabaseFetcher {
             ps.setString(1, username);
             ps.setString(2, password);
             ps.executeUpdate();
+            return;
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());

@@ -1,14 +1,15 @@
 package com.animearray.ouranimearray.view;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeIn;
+import animatefx.animation.SlideInUp;
 import com.animearray.ouranimearray.model.Anime;
 import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
+import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
@@ -26,7 +27,6 @@ import org.controlsfx.control.GridView;
 import org.tbee.javafx.scene.layout.MigPane;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.animearray.ouranimearray.view.Widgets.*;
 
@@ -56,6 +56,12 @@ public class ViewBuilder implements Builder<Region> {
 
         // User sees search pane on startup
         model.currentMainPaneProperty().set(searchPane);
+        // When user logs in, switch user view to searchPane
+        model.isLoggedInProperty().addListener(observable -> {
+            if (model.isLoggedInProperty().getValue()) {
+                model.currentMainPaneProperty().set(searchPane);
+            }
+        });
 
         // Main pane switches according to user menu
         model.currentMainPaneProperty().addListener((observable, oldPane, newPane) -> {
@@ -66,7 +72,6 @@ public class ViewBuilder implements Builder<Region> {
 
         // Switch between panes
         basePane.add(model.getCurrentMainPane(), new CC().grow().minWidth("30mm").hideMode(3));
-
         basePane.add(setupNavigationBar(searchPane, loginRegisterPane), new CC().dockNorth());
         basePane.add(setupLeftSideBar(loginPane), new CC().dockWest().width("15%").hideMode(3));
         basePane.add(setupRightSideBar(), new CC().dockEast().width("20%").hideMode(3));
@@ -85,7 +90,7 @@ public class ViewBuilder implements Builder<Region> {
         loginRegisterPane.add(loginPane, new CC().hideMode(3));
         loginRegisterPane.add(registerPane, new CC().hideMode(3));
 
-        var registerPaneLink = new Hyperlink("Already have an account?");
+        var registerPaneLink = new Hyperlink("Don't have an account?");
         registerPaneLink.setTextAlignment(TextAlignment.CENTER);
         registerPaneLink.setAlignment(Pos.CENTER);
         registerPaneLink.setOnAction(event -> {
@@ -96,7 +101,7 @@ public class ViewBuilder implements Builder<Region> {
 
         loginPane.add(registerPaneLink, new CC().grow());
 
-        var loginPaneLink = new Hyperlink("Don't have an account?");
+        var loginPaneLink = new Hyperlink("Already have an account?");
         loginPaneLink.setTextAlignment(TextAlignment.CENTER);
         loginPaneLink.setAlignment(Pos.CENTER);
         loginPaneLink.setOnAction(event -> {
@@ -104,6 +109,7 @@ public class ViewBuilder implements Builder<Region> {
             loginPane.setVisible(true);
             new FadeIn(loginPane).play();
         });
+
         registerPane.add(loginPaneLink, new CC().grow());
 
         loginPane.setVisible(true);
@@ -124,34 +130,44 @@ public class ViewBuilder implements Builder<Region> {
                 new LC().align("center", "center").wrap()
         );
 
-        MFXTextField usernameField = new MFXTextField();
-        usernameField.setFloatingText("Username");
-        usernameField.textProperty().bindBidirectional(model.usernameProperty());
+        var validationLabel = createValidationLabel();
+        validationLabel.setVisible(false);
 
-        MFXPasswordField passwordField = new MFXPasswordField();
+        var usernameField = new MFXTextField();
+        usernameField.setFloatingText("Username");
+        usernameField.textProperty().bindBidirectional(model.usernameLoginProperty());
+
+        var passwordField = new MFXPasswordField();
         passwordField.setFloatingText("Password");
-        passwordField.textProperty().bindBidirectional(model.passwordProperty());
+        passwordField.textProperty().bindBidirectional(model.passwordLoginProperty());
 
         MFXButton loginButton = new MFXButton("Login");
 
+        var isInvalid = EasyBind.combine(usernameField.textProperty(), passwordField.textProperty(),
+                (username, password) -> username.isEmpty() || password.isEmpty());
+
         BooleanProperty isFetchingUser = new SimpleBooleanProperty(false);
 
-        var disableRegisterButtonBinding = Bindings.createBooleanBinding(
-                () -> isFetchingUser.get() || (passwordField.textProperty().isEmpty().get() || usernameField.textProperty().isEmpty().get()),
-                isFetchingUser, passwordField.textProperty(), usernameField.textProperty());
+        var disableRegisterButtonBinding = EasyBind.combine(isInvalid, isFetchingUser,
+                (invalid, fetching) -> invalid || fetching);
 
         loginButton.disableProperty().bind(disableRegisterButtonBinding);
 
         loginButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> isFetchingUser.set(false));
+            userFetcher.accept(() -> {
+                isFetchingUser.set(false);
+                if (!model.isLoggedInProperty().getValue()) {
+                    validationLabel.setVisible(true);
+                    validationLabel.setText("Wrong username or password, please try again");
+                }
+            });
         });
-
 
         loginPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
         loginPane.add(passwordField, new CC().sizeGroup("login").grow());
         loginPane.add(loginButton, new CC().grow());
-
+        loginPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center").hideMode(3));
 
         loginPane.setVisible(false);
         return loginPane;
@@ -162,37 +178,33 @@ public class ViewBuilder implements Builder<Region> {
                 new LC().align("center", "center").wrap()
         );
 
-        var validationLabel = new Label();
-        validationLabel.getStyleClass().add("validationLabel");
-        validationLabel.setWrapText(true);
-        validationLabel.setTextAlignment(TextAlignment.CENTER);
-        validationLabel.setVisible(false);
+        Label validationLabel = createValidationLabel();
 
         var usernameField = createRegisterUsernameField(validationLabel);
-        usernameField.setFloatingText("Username");
-        MFXPasswordField passwordField = Widgets.createRegisterPasswordField(validationLabel);
+        usernameField.textProperty().bindBidirectional(model.usernameRegisterProperty());
 
-        MFXButton registerButton = new MFXButton("Register");
-        registerButton.setDisable(true);
+        var passwordField = createRegisterPasswordField(validationLabel);
+        passwordField.textProperty().bindBidirectional(model.passwordRegisterProperty());
 
-        // Check if passwordField has PseudoClass named invalid
-        var isInvalid = Bindings.createBooleanBinding(
-                () -> passwordField.getPseudoClassStates().stream()
-                        .anyMatch(pseudoClass -> pseudoClass.getPseudoClassName().equals("invalid")),
-                passwordField.getPseudoClassStates());
+        var registerButton = new MFXButton("Register");
+
+        var isInvalid = EasyBind.combine(usernameField.getValidator().validProperty(), passwordField.getValidator().validProperty(),
+                (username, password) -> !username || !password);
 
         BooleanProperty isFetchingUser = new SimpleBooleanProperty(false);
 
-        var disableRegisterButtonBinding = Bindings.createBooleanBinding(
-                () -> isInvalid.get() && isFetchingUser.get()
-                        || (passwordField.textProperty().isEmpty().get() || usernameField.textProperty().isEmpty().get()),
-                isInvalid, isFetchingUser, passwordField.textProperty(), usernameField.textProperty());
+        var disableRegisterButtonBinding = EasyBind.combine(isInvalid, isFetchingUser,
+                (invalid, fetching) -> invalid || fetching);
 
         registerButton.disableProperty().bind(disableRegisterButtonBinding);
 
         registerButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> isFetchingUser.set(false));
+            userFetcher.accept(() -> {
+                isFetchingUser.set(false);
+                model.setUsernameRegister("");
+                model.setPasswordRegister("");
+            });
         });
 
         registerPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
@@ -235,12 +247,23 @@ public class ViewBuilder implements Builder<Region> {
                 oldVal.setSelected(true);
         });
 
-        topSideBar.add(createMyListToggle(model, "mfx-menu-v3", "My List", new ToggleGroup()), new CC().grow().sizeGroup("toggle").alignX("left"));
-        topSideBar.add(createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane), new CC().grow().sizeGroup("toggle").alignX("right"));
-        topSideBar.add(createNavToggle(model, "mfx-user", "Login / Register", toggleGroup, loginRegisterPane), new CC().grow().sizeGroup("toggle").alignX("right"));
-        topSideBar.getStyleClass().add("navbar");
+        var myListButton = createMyListToggle(model, "mfx-menu-v3", "My List", new ToggleGroup());
+        var searchButton = createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane);
+        searchButton.setSelected(true);
+        var loginRegisterButton = createNavToggle(model, "mfx-user", "Login / Register", toggleGroup, loginRegisterPane);
+        var myProfileButton = createNavToggle(model, "mfx-user", "My Profile", toggleGroup, loginRegisterPane);
 
-        model.isLoggedInProperty().addListener(observable -> System.out.println("hi"));
+        myProfileButton.visibleProperty().bind(model.isLoggedInProperty());
+        myListButton.visibleProperty().bind(model.isLoggedInProperty());
+        // When model.isLoggedInProperty is equal to false
+        loginRegisterButton.visibleProperty().bind(EasyBind.map(model.isLoggedInProperty(), Boolean.FALSE::equals));
+
+        topSideBar.add(myListButton, new CC().grow().sizeGroup("toggle").alignX("left"));
+        topSideBar.add(searchButton, new CC().grow().sizeGroup("toggle").alignX("right"));
+        topSideBar.add(loginRegisterButton, new CC().grow().sizeGroup("toggle").alignX("right").hideMode(3));
+        topSideBar.add(myProfileButton, new CC().grow().sizeGroup("toggle").alignX("right").hideMode(3));
+
+        topSideBar.getStyleClass().add("navbar");
 
         return topSideBar;
     }

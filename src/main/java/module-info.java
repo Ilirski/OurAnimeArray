@@ -16,7 +16,7 @@ module com.animearray.ouranimearray {
 //    requires jdk.incubator.concurrent; // Java 19 Virtual Threads
 
     opens com.animearray.ouranimearray to javafx.fxml;
-    exports com.animearray.ouranimearray;
+    exports com.animearray.ouranimearray to javafx.graphics;
     exports com.animearray.ouranimearray.view;
     exports com.animearray.ouranimearray.model;
     opens com.animearray.ouranimearray.view to javafx.fxml;

@@ -39,10 +39,6 @@ public class SimpleAnimeProperty extends SimpleObjectProperty<Anime> {
         this.synopsis = EasyBind.wrapNullable(this.anime).map(Anime::synopsis).orElse("Synopsis Not Found");
     }
 
-    public Anime getAnime() {
-        return anime.get();
-    }
-
     public ObjectProperty<Anime> animeProperty() {
         return anime;
     }

@@ -24,15 +24,14 @@ public class AnimeInteractor {
     }
 
     public void registerUser() {
-        databaseFetcher.createUser(viewModel.getUsername(), viewModel.getPassword());
+        databaseFetcher.createUser(viewModel.getUsernameRegister(), viewModel.getPasswordRegister());
         System.out.println("User created");
     }
 
     public void getUser() {
-        Optional<String> user = databaseFetcher.getUser(viewModel.getUsername(), viewModel.getPassword());
-        // Set userid to empty if user not found
-        viewModel.setCurrentUserID(user.orElse(""));
-        System.out.println(user);
+        Optional<String> user = databaseFetcher.getUser(viewModel.getUsernameLogin(), viewModel.getPasswordLogin());
+        // If userid is present, set it. Else, do nothing.
+        user.ifPresentOrElse(viewModel::setCurrentUserID, () -> {});
     }
 
 
