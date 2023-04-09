@@ -3,22 +3,16 @@ package com.animearray.ouranimearray.model;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import org.controlsfx.control.GridCell;
 import org.tbee.javafx.scene.layout.MigPane;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import static com.animearray.ouranimearray.model.MouseClickNotDragDetector.clickNotDragDetectingOn;
-import static java.lang.System.currentTimeMillis;
 
 public class AnimeGridCell extends GridCell<Anime> {
     private final ImageView imageView;
@@ -45,6 +39,8 @@ public class AnimeGridCell extends GridCell<Anime> {
         // See https://stackoverflow.com/questions/24607969/mouse-events-get-ignored-on-the-underlying-layer
         setPickOnBounds(false);
 
+        // https://stackoverflow.com/questions/27064975/rotate-a-dragboard-javafx-8
+        // https://stackoverflow.com/questions/22424082/drag-and-drop-vbox-element-with-show-snapshot-in-javafx
         clickNotDragDetectingOn(this)
                 .withPressedDurationThreshold()
                 .setOnMouseClickedNotDragged(event -> {
@@ -86,25 +82,6 @@ public class AnimeGridCell extends GridCell<Anime> {
                 this.getScene().setCursor(Cursor.DEFAULT);
             }
         });
-
-//        setOnMousePressed(me -> {
-//            if (me.isPrimaryButtonDown()) {
-//                this.getScene().setCursor(Cursor.DEFAULT);
-//            }
-//
-//            Anime item = getItem();
-//            if (item != null) {
-//                model.setAnimePoster(item.image());
-//                model.setAnimeTitle(item.title());
-//                model.setAnimeSynopsis(item.synopsis());
-//                if (!model.isRightSideBarVisible()) {
-//                    model.setRightSideBarVisible(true);
-//                }
-//            }
-//        });
-
-        // https://stackoverflow.com/questions/27064975/rotate-a-dragboard-javafx-8
-        // https://stackoverflow.com/questions/22424082/drag-and-drop-vbox-element-with-show-snapshot-in-javafx
     }
 
     public static Rectangle2D calculateImageCrop(Image image, double targetWidth, double targetHeight) {

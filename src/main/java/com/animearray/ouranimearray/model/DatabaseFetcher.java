@@ -17,7 +17,7 @@ public class DatabaseFetcher {
     String ERROR_IMAGE_URL = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
     public Optional<String> getUser(String username, String password) {
-        String sql = "SELECT * FROM user WHERE username = ? AND password = ? LIMIT 1";
+        String sql = "SELECT rowid, * FROM user WHERE username = ? AND password = ? LIMIT 1";
 
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -27,7 +27,7 @@ public class DatabaseFetcher {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String id = rs.getString("id");
+                String id = rs.getString("rowid");
                 return Optional.of(id);
             } else {
                 return Optional.empty();
@@ -35,9 +35,8 @@ public class DatabaseFetcher {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return Optional.empty();
         }
-
-        throw new RuntimeException("Problem with SQL fetching");
     }
 
     public void createUser(String username, String password) {
@@ -49,13 +48,12 @@ public class DatabaseFetcher {
             ps.setString(1, username);
             ps.setString(2, password);
             ps.executeUpdate();
-            return;
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
-        throw new RuntimeException("Problem with SQL fetching");
+        // explicit return statement needed to end method call
+        return;
     }
 
     public List<User> getUsers() {
@@ -64,9 +62,9 @@ public class DatabaseFetcher {
 
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT id, * FROM user LIMIT 30")) {
+             ResultSet rs = stmt.executeQuery("SELECT rowid, * FROM user LIMIT 30")) {
             while (rs.next()) {
-                String id = rs.getString("id");
+                String id = rs.getString("rowid");
                 String username = rs.getString("username");
                 String password = rs.getString("password");
 
@@ -97,13 +95,23 @@ public class DatabaseFetcher {
     }
 
     public List<Anime> searchAnime(String query) {
-        String sql = "SELECT rowid, * FROM anime WHERE title LIKE ? ORDER BY score DESC LIMIT 30";
+//        String sql = "SELECT rowid, * FROM anime WHERE title LIKE ? ORDER BY score DESC LIMIT 30";
+       String sql = """
+        SELECT anime.rowid, GROUP_CONCAT(genre.genre_name) AS genres, *
+        FROM anime
+        JOIN genre_anime ON anime.rowid = genre_anime.id_anime AND anime.title LIKE ?
+        JOIN genre ON genre.rowid = genre_anime.id_genre
+        GROUP BY anime.rowid
+        ORDER BY score DESC
+        LIMIT 30
+        """;
 
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + query + "%"); // add wildcards for fuzzy search
 
             ResultSet rs = ps.executeQuery();
+            System.out.println("Executing query...");
 
             return getAnime(rs);
         } catch (SQLException e) {
@@ -123,10 +131,12 @@ public class DatabaseFetcher {
             int episodes = rs.getInt("episodes");
             double score = rs.getDouble("score");
             String synopsis = rs.getString("synopsis");
+            String genres = rs.getString("genres");
+            List<String> gen = List.of(genres.split(","));
 
             CompletableFuture<Anime> animeFuture = CompletableFuture.supplyAsync(() -> turnUrlToImage(imageUrl))
                     .completeOnTimeout(turnUrlToImage(ERROR_IMAGE_URL), 5, TimeUnit.SECONDS)
-                    .thenApply(image -> new Anime(id, title, image, episodes, score, synopsis));
+                    .thenApply(image -> new Anime(id, title, image, episodes, score, synopsis, gen));
 
             animeFutures.add(animeFuture);
         }

@@ -1,12 +1,14 @@
 package com.animearray.ouranimearray.view;
 
 import animatefx.animation.Wobble;
+import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
 import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXRectangleToggleNode;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.enums.FloatMode;
+import io.github.palexdev.materialfx.font.FontResources;
 import io.github.palexdev.materialfx.font.MFXFontIcon;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
@@ -67,7 +69,6 @@ public class Widgets {
                 ))
                 .get();
 
-
         Constraint charactersConstraint = Constraint.Builder.build()
                 .setSeverity(Severity.ERROR)
                 .setMessage("Password must contain at least one lowercase and one uppercase characters")
@@ -81,7 +82,6 @@ public class Widgets {
                 .constraint(digitConstraint)
                 .constraint(charactersConstraint)
                 .constraint(lengthConstraint);
-
 
         addValidationListeners(passwordField, validationLabel);
 
@@ -145,8 +145,8 @@ public class Widgets {
 
         return searchBar;
     }
-    static MFXRectangleToggleNode createListToggle(Model model, String icon, String text, ToggleGroup toggleGroup, MigPane paneToSwitch) {
-        MFXIconWrapper wrapper = new MFXIconWrapper(icon, 24, 32);
+    static MFXRectangleToggleNode createListToggle(Model model, String text, ToggleGroup toggleGroup, MigPane paneToSwitch) {
+        MFXIconWrapper wrapper = new MFXIconWrapper(FontResources.FOLDER.getDescription(), 24, 32);
 
         MFXRectangleToggleNode toggleNode = new MFXRectangleToggleNode(text, wrapper);
         toggleNode.setAlignment(Pos.CENTER_LEFT);
@@ -158,7 +158,8 @@ public class Widgets {
         });
 
         toggleNode.setOnMouseDragReleased(event -> {
-            System.out.println("moob");
+            var hi = (AnimeGridCell) event.getGestureSource();
+            System.out.println(hi.getItem());
         });
 
         toggleNode.setOnMouseDragEntered(event -> {

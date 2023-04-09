@@ -25,7 +25,7 @@ public class Controller {
     private void fetchAnimeList(Runnable postFetchAnimeList) {
         Task<Void> fetchTask = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 interactor.searchAnime();
                 return null;
             }
@@ -41,14 +41,12 @@ public class Controller {
     private void verifyUser(Runnable postFetchUsers) {
         Task<Void> fetchTask = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 interactor.getUser();
                 return null;
             }
         };
-        fetchTask.setOnSucceeded(event -> {
-            postFetchUsers.run();
-        });
+        fetchTask.setOnSucceeded(event -> postFetchUsers.run());
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
     }
@@ -56,14 +54,12 @@ public class Controller {
     private void registerUser(Runnable postFetchUsers) {
         Task<Void> fetchTask = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 interactor.registerUser();
                 return null;
             }
         };
-        fetchTask.setOnSucceeded(event -> {
-            postFetchUsers.run();
-        });
+        fetchTask.setOnSucceeded(event -> postFetchUsers.run());
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
     }

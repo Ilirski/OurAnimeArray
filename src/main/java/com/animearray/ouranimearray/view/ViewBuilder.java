@@ -26,7 +26,9 @@ import net.miginfocom.layout.LC;
 import org.controlsfx.control.GridView;
 import org.tbee.javafx.scene.layout.MigPane;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.animearray.ouranimearray.view.Widgets.*;
 
@@ -45,7 +47,10 @@ public class ViewBuilder implements Builder<Region> {
 
     @Override
     public Region build() {
-        MigPane basePane = new MigPane(new LC().fill(), new AC().grow(), new AC().grow());
+        MigPane basePane = new MigPane(
+                new LC().fill(),
+                new AC().grow(),
+                new AC().grow());
         basePane.setId("basePane");
 
         // Setup panes
@@ -53,6 +58,7 @@ public class ViewBuilder implements Builder<Region> {
         MigPane loginPane = setupLoginPane(userFetcher);
         MigPane registerPane = setupRegisterPane(userRegister);
         MigPane loginRegisterPane = setupLoginRegisterPane(loginPane, registerPane);
+        MigPane myProfilePane = setupMyProfile(userFetcher);
 
         // User sees search pane on startup
         model.currentMainPaneProperty().set(searchPane);
@@ -72,12 +78,14 @@ public class ViewBuilder implements Builder<Region> {
 
         // Switch between panes
         basePane.add(model.getCurrentMainPane(), new CC().grow().minWidth("30mm").hideMode(3));
-        basePane.add(setupNavigationBar(searchPane, loginRegisterPane), new CC().dockNorth());
+        // Navigation bar
+        basePane.add(setupNavigationBar(searchPane, loginRegisterPane, myProfilePane), new CC().dockNorth());
         basePane.add(setupLeftSideBar(loginPane), new CC().dockWest().width("15%").hideMode(3));
         basePane.add(setupRightSideBar(), new CC().dockEast().width("20%").hideMode(3));
 
         // Don't forget to add the other panes to the basePane
         basePane.add(loginRegisterPane, new CC().grow().minWidth("30mm").hideMode(3));
+        basePane.add(myProfilePane, new CC().grow().minWidth("30mm").hideMode(3));
 
         return basePane;
     }
@@ -91,6 +99,18 @@ public class ViewBuilder implements Builder<Region> {
         loginRegisterPane.add(registerPane, new CC().hideMode(3));
 
         var registerPaneLink = new Hyperlink("Don't have an account?");
+        createPaneLink(loginPane, registerPane, registerPaneLink);
+
+        var loginPaneLink = new Hyperlink("Already have an account?");
+        createPaneLink(registerPane, loginPane, loginPaneLink);
+
+        registerPane.setVisible(false);
+        loginPane.setVisible(true);
+        loginRegisterPane.setVisible(false);
+        return loginRegisterPane;
+    }
+
+    private void createPaneLink(MigPane loginPane, MigPane registerPane, Hyperlink registerPaneLink) {
         registerPaneLink.setTextAlignment(TextAlignment.CENTER);
         registerPaneLink.setAlignment(Pos.CENTER);
         registerPaneLink.setOnAction(event -> {
@@ -98,23 +118,7 @@ public class ViewBuilder implements Builder<Region> {
             registerPane.setVisible(true);
             new FadeIn(registerPane).play();
         });
-
         loginPane.add(registerPaneLink, new CC().grow());
-
-        var loginPaneLink = new Hyperlink("Already have an account?");
-        loginPaneLink.setTextAlignment(TextAlignment.CENTER);
-        loginPaneLink.setAlignment(Pos.CENTER);
-        loginPaneLink.setOnAction(event -> {
-            registerPane.setVisible(false);
-            loginPane.setVisible(true);
-            new FadeIn(loginPane).play();
-        });
-
-        registerPane.add(loginPaneLink, new CC().grow());
-
-        loginPane.setVisible(true);
-        loginRegisterPane.setVisible(false);
-        return loginRegisterPane;
     }
 
     private MigPane setupMyListPane(Consumer<Runnable> userFetcher) {
@@ -122,6 +126,18 @@ public class ViewBuilder implements Builder<Region> {
                 new LC().align("center", "center")
         );
 
+        return myListPane;
+    }
+
+    private MigPane setupMyProfile(Consumer<Runnable> userFetcher) {
+        MigPane myListPane = new MigPane(
+                new LC().align("center", "center")
+        );
+
+        var label = new Label("Profile");
+        myListPane.add(label);
+
+        myListPane.setVisible(false);
         return myListPane;
     }
 
@@ -141,7 +157,7 @@ public class ViewBuilder implements Builder<Region> {
         passwordField.setFloatingText("Password");
         passwordField.textProperty().bindBidirectional(model.passwordLoginProperty());
 
-        MFXButton loginButton = new MFXButton("Login");
+        var loginButton = new MFXButton("Login");
 
         var isInvalid = EasyBind.combine(usernameField.textProperty(), passwordField.textProperty(),
                 (username, password) -> username.isEmpty() || password.isEmpty());
@@ -234,7 +250,7 @@ public class ViewBuilder implements Builder<Region> {
         return searchPane;
     }
 
-    private MigPane setupNavigationBar(MigPane searchPane, MigPane loginRegisterPane) {
+    private MigPane setupNavigationBar(MigPane searchPane, MigPane loginRegisterPane, MigPane myProfilePane) {
         MigPane topSideBar = new MigPane(
                 new LC(),
                 new AC().gap("push", 0)
@@ -251,12 +267,12 @@ public class ViewBuilder implements Builder<Region> {
         var searchButton = createNavToggle(model, "mfx-magnifying-glass", "Search", toggleGroup, searchPane);
         searchButton.setSelected(true);
         var loginRegisterButton = createNavToggle(model, "mfx-user", "Login / Register", toggleGroup, loginRegisterPane);
-        var myProfileButton = createNavToggle(model, "mfx-user", "My Profile", toggleGroup, loginRegisterPane);
+        var myProfileButton = createNavToggle(model, "mfx-user", "My Profile", toggleGroup, myProfilePane);
 
         myProfileButton.visibleProperty().bind(model.isLoggedInProperty());
         myListButton.visibleProperty().bind(model.isLoggedInProperty());
         // When model.isLoggedInProperty is equal to false
-        loginRegisterButton.visibleProperty().bind(EasyBind.map(model.isLoggedInProperty(), Boolean.FALSE::equals));
+        loginRegisterButton.visibleProperty().bind(model.isLoggedInProperty().not());
 
         topSideBar.add(myListButton, new CC().grow().sizeGroup("toggle").alignX("left"));
         topSideBar.add(searchButton, new CC().grow().sizeGroup("toggle").alignX("right"));
@@ -277,15 +293,41 @@ public class ViewBuilder implements Builder<Region> {
         double targetWidth = 225;
         double targetHeight = 350;
 
+        // Image
         ImageView animePoster = createAnimePoster(model, targetWidth, targetHeight);
 
+        // Title
         Label animeTitle = new Label();
         animeTitle.textProperty().bind(model.animeProperty().titleBinding());
         animeTitle.setWrapText(true);
 
+        // Episode
+        Label animeEpisodes = new Label();
+        animeEpisodes.textProperty().bind(EasyBind.map(model.animeProperty().episodesBinding(), Object::toString));
+        animeEpisodes.setWrapText(true);
+
+        // Score
+        Label animeScore = new Label();
+        animeScore.textProperty().bind(EasyBind.map(model.animeProperty().scoreBinding(), Object::toString));
+        animeScore.setWrapText(true);
+
+        // Synopsis
         Label animeSynopsis = new Label();
         animeSynopsis.textProperty().bind(model.animeProperty().synopsisBinding());
         animeSynopsis.setWrapText(true);
+
+        // Genres
+        Label animeGenres = new Label();
+
+        // capitalize each word in a phrase.
+        // TODO: change sql schema to have genres be capitalized so this doesn't happen.
+        animeGenres.textProperty().bind(EasyBind.map(model.animeProperty().genresBinding(),
+                list -> list.stream()
+                        .map(phrase -> Arrays.stream(phrase.split(" "))
+                                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                                .collect(Collectors.joining(" ")))
+                        .collect(Collectors.joining(", "))));
+        animeGenres.setWrapText(true);
 
         MFXButton button = new MFXButton("Exit");
         button.setOnAction(event -> model.setRightSideBarVisible(false));
@@ -297,6 +339,9 @@ public class ViewBuilder implements Builder<Region> {
 
         rightSideBar.add(animePoster, new CC().wrap());
         rightSideBar.add(animeTitle, new CC().wrap());
+        rightSideBar.add(animeEpisodes, new CC().split(2));
+        rightSideBar.add(animeScore, new CC().wrap());
+        rightSideBar.add(animeGenres, new CC().wrap());
         rightSideBar.add(animeSynopsis, new CC().wrap());
         rightSideBar.add(button);
 
@@ -309,8 +354,8 @@ public class ViewBuilder implements Builder<Region> {
 
         MigPane migScrollPane = new MigPane(new LC().wrapAfter(1));
 
-        migScrollPane.add(createListToggle(model, "mfx-user", "My Lists", toggleGroup, mainPane2), new CC().grow().sizeGroup("toggle"));
-        migScrollPane.add(createListToggle(model, "mfx-user", "Recommended", toggleGroup, mainPane2), new CC().grow().sizeGroup("toggle"));
+        migScrollPane.add(createListToggle(model, "My Lists", toggleGroup, mainPane2), new CC().grow().sizeGroup("toggle"));
+        migScrollPane.add(createListToggle(model, "Recommended", toggleGroup, mainPane2), new CC().grow().sizeGroup("toggle"));
 
         leftSideBar.visibleProperty().bindBidirectional(model.leftSideBarVisibleProperty());
 

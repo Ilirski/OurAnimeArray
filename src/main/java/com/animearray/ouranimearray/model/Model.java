@@ -2,6 +2,7 @@ package com.animearray.ouranimearray.model;
 
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Binding;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,12 +16,13 @@ public class Model {
     private final ObjectProperty<MigPane> currentMainPane = new SimpleObjectProperty<>();
     private final SimpleAnimeProperty anime = new SimpleAnimeProperty();
     private final StringProperty searchQuery = new SimpleStringProperty("");
-    private final StringProperty currentUserID = new SimpleStringProperty("");
+    private final StringProperty currentUserID = new SimpleStringProperty();
     private final StringProperty usernameRegister = new SimpleStringProperty("");
     private final StringProperty passwordRegister = new SimpleStringProperty("");
     private final StringProperty usernameLogin = new SimpleStringProperty("");
     private final StringProperty passwordLogin = new SimpleStringProperty("");
-    private final Binding<Boolean> isLoggedIn = EasyBind.wrap(currentUserID).map(String::isBlank).map(Boolean.FALSE::equals);
+    private final BooleanBinding isLoggedIn = EasyBind.wrapNullable(currentUserID).isPresent();
+//    private final Binding<Boolean> isLoggedIn = EasyBind.wrap(currentUserID).map(String::isBlank).map(Boolean.FALSE::equals);
 
     public String getUsernameLogin() {
         return usernameLogin.get();
@@ -46,7 +48,7 @@ public class Model {
         return passwordLogin;
     }
 
-    public Binding<Boolean> isLoggedInProperty() {
+    public BooleanBinding isLoggedInProperty() {
         return isLoggedIn;
     }
 
