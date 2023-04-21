@@ -5,6 +5,7 @@ import com.animearray.ouranimearray.model.DatabaseFetcher;
 import com.animearray.ouranimearray.model.Model;
 import com.animearray.ouranimearray.model.User;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +25,16 @@ public class AnimeInteractor {
     }
 
     public void registerUser() {
-        databaseFetcher.createUser(viewModel.getUsernameRegister(), viewModel.getPasswordRegister());
-        System.out.println("User created");
+        try {
+            databaseFetcher.createUser(viewModel.getUsernameRegister(), viewModel.getPasswordRegister());
+        } catch (SQLException e) {
+            var errorCode = e.getErrorCode();
+
+            // Username already exists
+            if (errorCode == 19) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public void getUser() {

@@ -1,5 +1,6 @@
 package com.animearray.ouranimearray.view;
 
+import animatefx.animation.FadeIn;
 import animatefx.animation.Wobble;
 import com.animearray.ouranimearray.model.AnimeGridCell;
 import com.animearray.ouranimearray.model.Model;
@@ -16,6 +17,7 @@ import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
@@ -197,5 +199,17 @@ public class Widgets {
         });
 
         return toggleNode;
+    }
+
+    static Hyperlink createPaneLink(MigPane loginPane, MigPane registerPane, String text) {
+        var paneLink = new Hyperlink(text);
+        paneLink.setTextAlignment(TextAlignment.CENTER);
+        paneLink.setAlignment(Pos.CENTER);
+        paneLink.setOnAction(event -> {
+            loginPane.setVisible(false);
+            registerPane.setVisible(true);
+            new FadeIn(registerPane).play();
+        });
+        return paneLink;
     }
 }

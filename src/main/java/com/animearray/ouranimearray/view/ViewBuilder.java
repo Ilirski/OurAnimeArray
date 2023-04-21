@@ -98,27 +98,16 @@ public class ViewBuilder implements Builder<Region> {
         loginRegisterPane.add(loginPane, new CC().hideMode(3));
         loginRegisterPane.add(registerPane, new CC().hideMode(3));
 
-        var registerPaneLink = new Hyperlink("Don't have an account?");
-        createPaneLink(loginPane, registerPane, registerPaneLink);
+        var registerPaneLink = createPaneLink(loginPane, registerPane, "Don't have an account?");
+        loginPane.add(registerPaneLink, new CC().grow());
 
-        var loginPaneLink = new Hyperlink("Already have an account?");
-        createPaneLink(registerPane, loginPane, loginPaneLink);
+        var loginPaneLink = createPaneLink(registerPane, loginPane, "Already have an account?");
+        registerPane.add(loginPaneLink, new CC().grow());
 
         registerPane.setVisible(false);
         loginPane.setVisible(true);
         loginRegisterPane.setVisible(false);
         return loginRegisterPane;
-    }
-
-    private void createPaneLink(MigPane loginPane, MigPane registerPane, Hyperlink registerPaneLink) {
-        registerPaneLink.setTextAlignment(TextAlignment.CENTER);
-        registerPaneLink.setAlignment(Pos.CENTER);
-        registerPaneLink.setOnAction(event -> {
-            loginPane.setVisible(false);
-            registerPane.setVisible(true);
-            new FadeIn(registerPane).play();
-        });
-        loginPane.add(registerPaneLink, new CC().grow());
     }
 
     private MigPane setupMyListPane(Consumer<Runnable> userFetcher) {

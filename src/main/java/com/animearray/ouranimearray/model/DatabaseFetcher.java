@@ -39,7 +39,7 @@ public class DatabaseFetcher {
         }
     }
 
-    public void createUser(String username, String password) {
+    public void createUser(String username, String password) throws SQLException {
         String sql = "INSERT INTO user(username, password) VALUES (?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -48,11 +48,8 @@ public class DatabaseFetcher {
             ps.setString(1, username);
             ps.setString(2, password);
             ps.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
-        // explicit return statement needed to end method call
+
         return;
     }
 
@@ -95,7 +92,6 @@ public class DatabaseFetcher {
     }
 
     public List<Anime> searchAnime(String query) {
-//        String sql = "SELECT rowid, * FROM anime WHERE title LIKE ? ORDER BY score DESC LIMIT 30";
        String sql = """
         SELECT anime.rowid, GROUP_CONCAT(genre.genre_name) AS genres, *
         FROM anime
@@ -103,7 +99,7 @@ public class DatabaseFetcher {
         JOIN genre ON genre.rowid = genre_anime.id_genre
         GROUP BY anime.rowid
         ORDER BY score DESC
-        LIMIT 30
+        LIMIT 50
         """;
 
         try (Connection conn = DriverManager.getConnection(url);
@@ -132,6 +128,8 @@ public class DatabaseFetcher {
             double score = rs.getDouble("score");
             String synopsis = rs.getString("synopsis");
             String genres = rs.getString("genres");
+
+            // Split genres into a list
             List<String> gen = List.of(genres.split(","));
 
             CompletableFuture<Anime> animeFuture = CompletableFuture.supplyAsync(() -> turnUrlToImage(imageUrl))
