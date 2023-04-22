@@ -3,7 +3,7 @@ package com.animearray.ouranimearray;
 //import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 //import io.github.palexdev.materialfx.css.themes.Themes;
 
-import com.animearray.ouranimearray.controller.Controller;
+import com.animearray.ouranimearray.home.HomePageController;
 import fr.brouillard.oss.cssfx.CSSFX;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -22,7 +22,7 @@ public class Main extends Application {
         System.out.println("JavaFX Version: " + System.getProperty("javafx.version"));
 
         stage.setTitle("OurAnimeArray");
-        Scene scene = new Scene(new Controller().getViewBuilder(), 1200, 600);
+        Scene scene = new Scene(new HomePageController().getViewBuilder(), 1200, 600);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet.css")).toExternalForm());
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/rimuru-thumbnail.jpg")).toString()));
         stage.setScene(scene);
