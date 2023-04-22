@@ -1,7 +1,6 @@
 package com.animearray.ouranimearray.interactor;
 
 import com.animearray.ouranimearray.controller.Controller;
-import com.animearray.ouranimearray.model.Model;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
@@ -9,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AnimeInteractorTest extends ApplicationTest {
     @Override

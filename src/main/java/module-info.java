@@ -17,14 +17,11 @@ module com.animearray.ouranimearray {
 
     opens com.animearray.ouranimearray to javafx.fxml;
     exports com.animearray.ouranimearray to javafx.graphics;
-    exports com.animearray.ouranimearray.view;
-    exports com.animearray.ouranimearray.model;
-    opens com.animearray.ouranimearray.view to javafx.fxml;
-    exports com.animearray.ouranimearray.misc;
-    opens com.animearray.ouranimearray.misc to javafx.fxml;
+    exports com.animearray.ouranimearray.widgets.misc;
+    opens com.animearray.ouranimearray.widgets.misc to javafx.fxml;
     opens com.animearray.ouranimearray.model to javafx.fxml;
-    exports com.animearray.ouranimearray.controller;
-    opens com.animearray.ouranimearray.controller to javafx.fxml;
-    exports com.animearray.ouranimearray.interactor;
-    opens com.animearray.ouranimearray.interactor to javafx.fxml;
+    exports com.animearray.ouranimearray.widgets;
+    opens com.animearray.ouranimearray.widgets to javafx.fxml;
+    exports com.animearray.ouranimearray.search;
+    opens com.animearray.ouranimearray.search to javafx.fxml;
 }

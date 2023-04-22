@@ -16,28 +16,28 @@ public class DatabaseFetcher {
     private static final String url = "jdbc:sqlite:C:\\Users\\User\\IdeaProjects\\OurAnimeArray\\src\\main\\java\\com\\animearray\\ouranimearray\\model\\anime.db";
     String ERROR_IMAGE_URL = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
-    public Optional<String> getUser(String username, String password) {
-        String sql = "SELECT rowid, * FROM user WHERE username = ? AND password = ? LIMIT 1";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement ps = conn.prepareStatement(sql);) {
-
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String id = rs.getString("rowid");
-                return Optional.of(id);
-            } else {
-                return Optional.empty();
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return Optional.empty();
-        }
-    }
+//    public Optional<String> getUser(String username, String password) {
+//        String sql = "SELECT rowid, * FROM user WHERE username = ? AND password = ? LIMIT 1";
+//
+//        try (Connection conn = DriverManager.getConnection(url);
+//             PreparedStatement ps = conn.prepareStatement(sql);) {
+//
+//            ps.setString(1, username);
+//            ps.setString(2, password);
+//            ResultSet rs = ps.executeQuery();
+//
+//            if (rs.next()) {
+//                String id = rs.getString("rowid");
+//                return Optional.of(id);
+//            } else {
+//                return Optional.empty();
+//            }
+//
+//        } catch (SQLException e) {
+//            System.out.println(e.getMessage());
+//            return Optional.empty();
+//        }
+//    }
 
     public void createUser(String username, String password) throws SQLException {
         String sql = "INSERT INTO user(username, password) VALUES (?, ?)";
@@ -53,6 +53,32 @@ public class DatabaseFetcher {
         return;
     }
 
+    public Optional<User> getUser(String username, String password) {
+        String sql = "SELECT rowid, * FROM user WHERE username = ? AND password = ? LIMIT 1";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String id = rs.getString("rowid");
+                String user = rs.getString("username");
+                String pass = rs.getString("password");
+                String accountType = rs.getString("account_type");
+                return Optional.of(new User(id, user, pass, AccountType.valueOf(accountType)));
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     public List<User> getUsers() {
 
         List<User> users = new ArrayList<>();
@@ -64,8 +90,9 @@ public class DatabaseFetcher {
                 String id = rs.getString("rowid");
                 String username = rs.getString("username");
                 String password = rs.getString("password");
+                String accountType = rs.getString("account_type");
 
-                users.add(new User(id, username, password));
+                users.add(new User(id, username, password, AccountType.valueOf(accountType)));
             }
 
             return users;
