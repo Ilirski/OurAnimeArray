@@ -40,7 +40,6 @@ public class SearchPageViewBuilder implements Builder<Region> {
 
     private MigPane createAnimeGridView(Consumer<Runnable> fetchAnimeList) {
         MigPane animeGridPane = new MigPane(new LC().fill());
-        animeGridPane.setBackground(Background.fill(Paint.valueOf("#2b2b2b")));
 
         GridView<Anime> animeGridView = new GridView<>(model.animeListProperty());
         animeGridView.setCellFactory(gridView -> new AnimeGridCell(model, true));
