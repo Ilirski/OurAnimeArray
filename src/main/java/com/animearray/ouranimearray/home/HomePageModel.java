@@ -1,7 +1,8 @@
 package com.animearray.ouranimearray.home;
 
-import com.animearray.ouranimearray.model.Anime;
-import com.animearray.ouranimearray.model.User;
+import com.animearray.ouranimearray.widgets.AccountType;
+import com.animearray.ouranimearray.widgets.Anime;
+import com.animearray.ouranimearray.widgets.User;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.BooleanBinding;
@@ -10,6 +11,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.function.Function;
+
 public class HomePageModel {
     private final AnimeProperty anime = new AnimeProperty();
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
@@ -17,8 +20,37 @@ public class HomePageModel {
     private final BooleanProperty searchPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty loginRegisterPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty profilePageSelected = new SimpleBooleanProperty(false);
+    private final BooleanProperty myListsPageSelected = new SimpleBooleanProperty(false);
+    private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanBinding loggedIn = EasyBind.wrapNullable(currentUser).isPresent();
+    private final BooleanBinding admin = EasyBind.wrapNullable(currentUser)
+            .map((Function<? super User, ?>) user -> user.accountType() == AccountType.ADMIN)
+            .isPresent();
+
+    public boolean isMyListsPageSelected() {
+        return myListsPageSelected.get();
+    }
+
+    public BooleanProperty myListsPageSelectedProperty() {
+        return myListsPageSelected;
+    }
+
+    public boolean isListPageSelected() {
+        return listPageSelected.get();
+    }
+
+    public BooleanProperty listPageSelectedProperty() {
+        return listPageSelected;
+    }
+
+    public Boolean isAdmin() {
+        return admin.get();
+    }
+
+    public BooleanBinding adminProperty() {
+        return admin;
+    }
 
     public User getCurrentUser() {
         return currentUser.get();
