@@ -1,6 +1,5 @@
 package com.animearray.ouranimearray.home;
 
-import com.animearray.ouranimearray.widgets.AccountType;
 import com.animearray.ouranimearray.widgets.Anime;
 import com.animearray.ouranimearray.widgets.User;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
@@ -10,13 +9,13 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.util.function.Function;
+import org.tbee.javafx.scene.layout.MigPane;
 
 public class HomePageModel {
     private final AnimeProperty anime = new AnimeProperty();
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty leftSideBarVisible = new SimpleBooleanProperty(false);
+    private final ObjectProperty<MigPane> mainPage = new SimpleObjectProperty<>();
     private final BooleanProperty searchPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty loginRegisterPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty profilePageSelected = new SimpleBooleanProperty(false);
@@ -24,9 +23,7 @@ public class HomePageModel {
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanBinding loggedIn = EasyBind.wrapNullable(currentUser).isPresent();
-    private final BooleanBinding admin = EasyBind.wrapNullable(currentUser)
-            .map((Function<? super User, ?>) user -> user.accountType() == AccountType.ADMIN)
-            .isPresent();
+    private final BooleanProperty admin = new SimpleBooleanProperty(false);
 
     public boolean isMyListsPageSelected() {
         return myListsPageSelected.get();
@@ -48,7 +45,7 @@ public class HomePageModel {
         return admin.get();
     }
 
-    public BooleanBinding adminProperty() {
+    public BooleanProperty adminProperty() {
         return admin;
     }
 

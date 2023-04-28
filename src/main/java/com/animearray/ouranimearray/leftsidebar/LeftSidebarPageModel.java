@@ -15,6 +15,19 @@ public class LeftSidebarPageModel {
     private final ObjectProperty<AnimeList> animeListToAddTo = new SimpleObjectProperty<>();
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanProperty loggedIn = new SimpleBooleanProperty(false);
+    private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
+
+    public boolean isListPageSelected() {
+        return listPageSelected.get();
+    }
+
+    public void setListPageSelected(boolean listPageSelected) {
+        this.listPageSelected.set(listPageSelected);
+    }
+
+    public BooleanProperty listPageSelectedProperty() {
+        return listPageSelected;
+    }
 
     public Anime getAnimeToAdd() {
         return animeToAdd.get();

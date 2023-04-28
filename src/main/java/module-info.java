@@ -18,8 +18,6 @@ module com.animearray.ouranimearray {
 
     opens com.animearray.ouranimearray to javafx.fxml;
     exports com.animearray.ouranimearray to javafx.graphics;
-    exports com.animearray.ouranimearray.widgets.misc;
-    opens com.animearray.ouranimearray.widgets.misc to javafx.fxml;
     opens com.animearray.ouranimearray.model to javafx.fxml;
     exports com.animearray.ouranimearray.widgets;
     opens com.animearray.ouranimearray.widgets to javafx.fxml;

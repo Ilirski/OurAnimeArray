@@ -38,6 +38,10 @@ public class AnimeListCell extends MFXListCell<AnimeList> {
             new Wobble(this).play();
         });
 
+        setOnMouseClicked(event -> {
+
+        });
+
         userIcon = new MFXFontIcon(FontResources.FOLDER.getDescription(), 18);
         render(data);
     }

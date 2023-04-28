@@ -1,6 +1,7 @@
 package com.animearray.ouranimearray.home;
 
 import animatefx.animation.SlideInUp;
+import com.animearray.ouranimearray.widgets.User;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.font.FontResources;
 import javafx.scene.control.ToggleGroup;
@@ -61,11 +62,11 @@ public class HomePageViewBuilder implements Builder<Region> {
         var searchToggle = createNavToggle(FontResources.MAGNIFYING_GLASS, "Search");
         var loginRegisterToggle = createNavToggle(FontResources.USER, "Login / Register");
         var profileToggle = createNavToggle(FontResources.USER, "Profile");
-        profileToggle.textProperty().bind(EasyBind.map(model.currentUserProperty(), user -> user == null ? "Profile" : user.username()));
+        profileToggle.textProperty().bind(EasyBind.wrapNullable(model.currentUserProperty()).map(User::username).orElse("Profile"));
 
-        // Ensure one toggle is always selected
         toggleGroup.getToggles().addAll(searchToggle, loginRegisterToggle, profileToggle);
         toggleGroup.selectToggle(searchToggle);
+        // Ensure one toggle is always selected
         toggleGroup.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
             if (newVal == null) oldVal.setSelected(true);
         });

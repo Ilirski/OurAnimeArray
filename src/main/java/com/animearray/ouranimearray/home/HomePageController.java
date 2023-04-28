@@ -16,11 +16,17 @@ public class HomePageController implements ControllerFX {
     public HomePageController() {
         HomePageModel model = new HomePageModel();
         viewBuilder = new HomePageViewBuilder(model,
-                new SearchPageController(model.animeProperty(), model.rightSideBarVisibleProperty()).getViewBuilder(),
-                new LoginRegisterPageController(model.currentUserProperty(), model.searchPageSelectedProperty()).getViewBuilder(),
+                new SearchPageController(model.animeProperty(),
+                        model.rightSideBarVisibleProperty()).getViewBuilder(),
+                new LoginRegisterPageController(model.currentUserProperty(),
+                        model.searchPageSelectedProperty()).getViewBuilder(),
                 new ProfilePageController(model.currentUserProperty()).getViewBuilder(),
-                new RightSidebarPageController(model.animeProperty(), model.currentUserProperty(), model.rightSideBarVisibleProperty()).getViewBuilder(),
-                new LeftSidebarPageController(model.currentUserProperty(), model.leftSideBarVisibleProperty()).getViewBuilder(),
+                new RightSidebarPageController(model.animeProperty(),
+                        model.currentUserProperty(),
+                        model.rightSideBarVisibleProperty()).getViewBuilder(),
+                new LeftSidebarPageController(model.currentUserProperty(),
+                        model.leftSideBarVisibleProperty(),
+                        model.listPageSelectedProperty()).getViewBuilder(),
                 new ListPageController(model.listPageSelectedProperty()).getViewBuilder()
         );
 

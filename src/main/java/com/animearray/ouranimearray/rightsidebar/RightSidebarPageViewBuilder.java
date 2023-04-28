@@ -8,6 +8,9 @@ import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXSpinner;
 import io.github.palexdev.materialfx.controls.models.spinner.IntegerSpinnerModel;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -105,6 +108,10 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 statusComboBox.requestLayout();
                 episodesWatchedSpinner.requestLayout();
                 scoreComboBox.requestLayout();
+                // Hacky way of letting the spinner know that the value has changed and it should update
+                var val = episodesWatchedSpinner.getValue();
+                episodesWatchedSpinner.setValue(0);
+                episodesWatchedSpinner.setValue(val);
             });
         });
 
@@ -149,9 +156,23 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         var episodesWatchedSpinnerModel = new IntegerSpinnerModel();
         episodesWatchedSpinner.setEditable(true);
         episodesWatchedSpinnerModel.maxProperty().bind(model.animeProperty().episodesBinding());
+//        model.userAnimeDataProperty().addListener(observable -> {
+//            var watchedEpisodes = model.getUserAnimeData().watchedEpisodes();
+//            if (watchedEpisodes == null || !model.isLoggedIn()) {
+//                return;
+//            }
+//            episodesWatchedSpinnerModel.setValue(watchedEpisodes);
+//        });
         episodesWatchedSpinnerModel.valueProperty().bindBidirectional(model.userAnimeDataProperty().watchedEpisodesProperty());
         episodesWatchedSpinner.setSpinnerModel(episodesWatchedSpinnerModel);
-        episodesWatchedSpinner.setTextTransformer((focused, text) -> !focused ? text + " episode(s)" : text);
+        episodesWatchedSpinner.setTextTransformer((focused, text) -> {
+            if (!focused) {
+                if (text.equals("0")) return "Not Started";
+                return text + "/" + model.getAnime().episodes() + " episodes";
+            } else {
+                return text;
+            }
+        });
         episodesWatchedSpinner.visibleProperty().bind(model.loggedInProperty());
         episodesWatchedSpinner.valueProperty().addListener(observable -> {
             setEpisodeWatched.accept(() -> {});

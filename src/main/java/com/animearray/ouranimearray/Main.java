@@ -23,6 +23,7 @@ public class Main extends Application {
 
         stage.setTitle("OurAnimeArray");
         Scene scene = new Scene(new HomePageController().getViewBuilder(), 1200, 600);
+
         // Styling
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet.css")).toExternalForm());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("tooltip.css")).toExternalForm());

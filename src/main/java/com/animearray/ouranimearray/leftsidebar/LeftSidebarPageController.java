@@ -13,7 +13,7 @@ public class LeftSidebarPageController implements ControllerFX {
     private final Builder<Region> viewBuilder;
     private final LeftSidebarPageInteractor interactor;
 
-    public LeftSidebarPageController(ObjectProperty<User> currentUserProperty, BooleanProperty leftSideBarVisibleProperty) {
+    public LeftSidebarPageController(ObjectProperty<User> currentUserProperty, BooleanProperty leftSideBarVisibleProperty, BooleanProperty listPageSelectedProperty) {
         var model = new LeftSidebarPageModel();
         interactor = new LeftSidebarPageInteractor(model);
         viewBuilder = new LeftSidebarPageViewBuilder(model, this::fetchAnimeLists, this::addAnimeToList);
@@ -21,6 +21,7 @@ public class LeftSidebarPageController implements ControllerFX {
         // Share the leftSideBarVisibleProperty with the model
         model.leftSideBarVisibleProperty().bind(leftSideBarVisibleProperty);
         model.currentUserProperty().bind(currentUserProperty);
+        model.listPageSelectedProperty().bindBidirectional(listPageSelectedProperty);
     }
 
     private void fetchAnimeLists(Runnable postAnimeListFetch) {
