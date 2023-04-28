@@ -1,6 +1,7 @@
 module com.animearray.ouranimearray {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.swing;// Scenic view (https://stackoverflow.com/q/64703153/17771525)
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
@@ -13,7 +14,7 @@ module com.animearray.ouranimearray {
     requires java.sql;
     requires sqlite.jdbc;
     requires com.tobiasdiez.easybind;
-//    requires jdk.incubator.concurrent; // Java 19 Virtual Threads
+    requires VirtualizedFX;
 
     opens com.animearray.ouranimearray to javafx.fxml;
     exports com.animearray.ouranimearray to javafx.graphics;

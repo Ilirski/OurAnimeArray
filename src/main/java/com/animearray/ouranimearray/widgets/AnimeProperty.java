@@ -1,9 +1,10 @@
 package com.animearray.ouranimearray.widgets;
 
-import com.animearray.ouranimearray.model.Anime;
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Binding;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 
 import java.util.Collections;
@@ -30,6 +31,21 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
         this.score = EasyBind.wrapNullable(this).map(Anime::score).orElse(0.0);
         this.synopsis = EasyBind.wrapNullable(this).map(Anime::synopsis).orElse("Synopsis Not Found");
         this.genres = EasyBind.wrapNullable(this).map(Anime::genres).orElse(Collections.singletonList("Genres Not Found"));
+    }
+
+    @Override
+    public void set(Anime newValue) {
+        super.set(newValue);
+    }
+
+    @Override
+    protected void invalidated() {
+        super.invalidated();
+    }
+
+    @Override
+    public Anime get() {
+        return super.get();
     }
 
     public AnimeProperty() {
@@ -71,6 +87,20 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
 
     @Override
     public String getName() {
-        return "anime";
+        return "AnimeProperty";
+    }
+
+    @Override
+    public String toString() {
+        return "AnimeProperty{" +
+                "imageUnavailableUrl='" + imageUnavailableUrl + '\'' +
+                ", id=" + id +
+                ", title=" + title +
+                ", image=" + image +
+                ", episodes=" + episodes +
+                ", score=" + score +
+                ", synopsis=" + synopsis +
+                ", genres=" + genres +
+                '}';
     }
 }

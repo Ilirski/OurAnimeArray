@@ -1,6 +1,7 @@
 package com.animearray.ouranimearray.home;
 
 import com.animearray.ouranimearray.leftsidebar.LeftSidebarPageController;
+import com.animearray.ouranimearray.list.ListPageController;
 import com.animearray.ouranimearray.loginregister.LoginRegisterPageController;
 import com.animearray.ouranimearray.profile.ProfilePageController;
 import com.animearray.ouranimearray.rightsidebar.RightSidebarPageController;
@@ -19,7 +20,8 @@ public class HomePageController implements ControllerFX {
                 new LoginRegisterPageController(model.currentUserProperty(), model.searchPageSelectedProperty()).getViewBuilder(),
                 new ProfilePageController(model.currentUserProperty()).getViewBuilder(),
                 new RightSidebarPageController(model.animeProperty(), model.currentUserProperty(), model.rightSideBarVisibleProperty()).getViewBuilder(),
-                new LeftSidebarPageController(model.leftSideBarVisibleProperty()).getViewBuilder()
+                new LeftSidebarPageController(model.currentUserProperty(), model.leftSideBarVisibleProperty()).getViewBuilder(),
+                new ListPageController(model.listPageSelectedProperty()).getViewBuilder()
         );
 
         model.adminProperty().addListener(observable -> System.out.println("Admin: " + model.adminProperty().get()));

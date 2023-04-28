@@ -1,13 +1,8 @@
 package com.animearray.ouranimearray.search;
 
-import com.animearray.ouranimearray.model.Anime;
+import com.animearray.ouranimearray.widgets.Anime;
 import com.animearray.ouranimearray.widgets.AnimeGridCell;
-import io.github.palexdev.materialfx.controls.MFXTextField;
-import io.github.palexdev.materialfx.enums.FloatMode;
-import io.github.palexdev.materialfx.font.MFXFontIcon;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Paint;
 import javafx.util.Builder;
 import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
@@ -42,7 +37,7 @@ public class SearchPageViewBuilder implements Builder<Region> {
         MigPane animeGridPane = new MigPane(new LC().fill());
 
         GridView<Anime> animeGridView = new GridView<>(model.animeListProperty());
-        animeGridView.setCellFactory(gridView -> new AnimeGridCell(model, true));
+        animeGridView.setCellFactory(gridView -> new AnimeGridCell(model.animeProperty(), model.rightSideBarVisibleProperty(), true));
         // We want image width : height -> 227.0 : 350.0
         animeGridView.setCellWidth(225);
         animeGridView.setCellHeight(350);

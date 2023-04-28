@@ -1,6 +1,7 @@
 package com.animearray.ouranimearray.profile;
 
-import com.animearray.ouranimearray.loginregister.LoginRegisterPageModel;
+import com.animearray.ouranimearray.widgets.User;
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
@@ -21,8 +22,12 @@ public class ProfilePageViewBuilder implements Builder<Region> {
         );
 
         var label = new Label("Profile Page");
-        profilePane.add(label, new CC().grow());
 
+        var usernameLabel = new Label();
+        usernameLabel.textProperty().bind(EasyBind.wrapNullable(model.currentUserProperty()).map(User::username).asOrdinary());
+
+        profilePane.add(label, new CC().grow());
+        profilePane.add(usernameLabel, new CC().grow());
         return profilePane;
     }
 }

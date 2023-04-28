@@ -1,7 +1,6 @@
 package com.animearray.ouranimearray.widgets;
 
-import com.animearray.ouranimearray.model.Anime;
-import com.animearray.ouranimearray.search.SearchPageModel;
+import io.github.palexdev.materialfx.controls.MFXTooltip;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
@@ -25,7 +24,7 @@ public class AnimeGridCell extends GridCell<Anime> {
     private final double targetWidth = 225;
     private final double targetHeight = 350;
 
-    public AnimeGridCell(SearchPageModel model, boolean preserveImageProperties) {
+    public AnimeGridCell(AnimeProperty animeProperty, BooleanProperty rightSidebarVisible, boolean preserveImageProperties) {
 
         this.preserveImageProperties = preserveImageProperties;
         imageView = new ImageView();
@@ -54,9 +53,9 @@ public class AnimeGridCell extends GridCell<Anime> {
                     // Item can be null
                     Anime item = getItem();
                     if (item != null) {
-                        model.setAnime(item);
-                        if (!model.isRightSideBarVisible()) {
-                            model.setRightSideBarVisible(true);
+                        animeProperty.set(item);
+                        if (!rightSidebarVisible.get()) {
+                            rightSidebarVisible.set(true);
                         }
                     }
                 });
@@ -141,6 +140,7 @@ public class AnimeGridCell extends GridCell<Anime> {
             double leftPaddingRequired = calculateLeftPaddingRequired(targetWidth);
             setPadding(new Insets(0, 0, 0, leftPaddingRequired));
             imageLabel.setText(animeTitle);
+            MFXTooltip.of(this, animeTitle).install();
             setGraphic(gridCell);
         }
     }
@@ -152,7 +152,7 @@ public class AnimeGridCell extends GridCell<Anime> {
         preview.setManaged(false);
         preview.setMouseTransparent(true);
         preview.setVisible(false);
-        MigPane basePane = (MigPane) getScene().lookup("#basePane");
+        MigPane basePane = (MigPane) getScene().lookup(".home-page");
         basePane.add(preview);
         setUserData(preview);
         setOnMouseDragged(event -> {
@@ -162,7 +162,7 @@ public class AnimeGridCell extends GridCell<Anime> {
     }
 
     private void removePreview() {
-        MigPane basePane = (MigPane) getScene().lookup("#basePane");
+        MigPane basePane = (MigPane) getScene().lookup(".home-page");
         setOnMouseDragged(null);
         basePane.getChildren().remove((ImageView) getUserData());
     }

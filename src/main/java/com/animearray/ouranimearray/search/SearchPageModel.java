@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.search;
 
-import com.animearray.ouranimearray.model.Anime;
+import com.animearray.ouranimearray.widgets.Anime;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

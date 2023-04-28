@@ -1,8 +1,7 @@
 package com.animearray.ouranimearray.loginregister;
 
-import com.animearray.ouranimearray.model.User;
+import com.animearray.ouranimearray.widgets.User;
 import com.tobiasdiez.easybind.EasyBind;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 

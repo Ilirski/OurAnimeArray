@@ -16,19 +16,30 @@ public class RightSidebarPageController implements ControllerFX {
     public RightSidebarPageController(AnimeProperty animeProperty, ObjectProperty<User> currentUserProperty, BooleanProperty rightSideBarVisibleProperty) {
         var model = new RightSidebarPageModel();
         interactor = new RightSidebarPageInteractor(model);
-        viewBuilder = new RightSidebarPageViewBuilder(model, this::getAnimeStatus, this::setAnimeStatus);
-
-//        animeProperty.addListener((observable, oldValue, newValue) -> {
-//                        if (newValue != null && model.isLoggedIn()) {
-//                interactor.getAnimeWatchStatus();
-//                interactor.updateAnimeWatchStatus();
-//            }
-//        });
+        viewBuilder = new RightSidebarPageViewBuilder(model, this::setAnimeStatus,
+                this::setEpisodeWatched, this::getUserAnimeData,
+                this::setUserScore);
 
         // Share model with other controllers
-        model.animeProperty().bindBidirectional(animeProperty);
         model.currentUserProperty().bind(currentUserProperty);
+        model.animeProperty().bindBidirectional(animeProperty);
         model.rightSideBarVisibleProperty().bindBidirectional(rightSideBarVisibleProperty);
+    }
+
+    private void getUserAnimeData(Runnable postUserAnimeDataGet) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.getUserAnimeData();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            interactor.updateUserAnimeData();
+            postUserAnimeDataGet.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
     }
 
     private void setAnimeStatus(Runnable postAnimeStatusSet) {
@@ -47,21 +58,38 @@ public class RightSidebarPageController implements ControllerFX {
         fetchThread.start();
     }
 
-    private void getAnimeStatus(Runnable postAnimeStatusGet) {
+    private void setEpisodeWatched(Runnable postEpisodeWatchedSet) {
         Task<Void> fetchTask = new Task<>() {
             @Override
             protected Void call() {
-                interactor.getAnimeWatchStatus();
+                interactor.setEpisodeWatched();
                 return null;
             }
         };
         fetchTask.setOnSucceeded(event -> {
-            interactor.updateAnimeWatchStatus();
-            postAnimeStatusGet.run();
+            interactor.updateEpisodeWatched();
+            postEpisodeWatchedSet.run();
         });
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
     }
+
+    public void setUserScore(Runnable postUserScoreSet) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.setUserAnimeScore();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            interactor.updateUserAnimeScore();
+            postUserScoreSet.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
     @Override
     public Region getViewBuilder() {
         return viewBuilder.build();

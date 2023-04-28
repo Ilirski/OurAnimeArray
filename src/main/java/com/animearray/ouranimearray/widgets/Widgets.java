@@ -1,7 +1,6 @@
 package com.animearray.ouranimearray.widgets;
 
 import animatefx.animation.Wobble;
-import com.animearray.ouranimearray.home.HomePageModel;
 import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXRectangleToggleNode;
@@ -53,8 +52,8 @@ public class Widgets {
 
         Constraint lengthConstraint = Constraint.Builder.build()
                 .setSeverity(Severity.ERROR)
-                .setMessage("Password must be at least 8 characters long")
-                .setCondition(passwordField.textProperty().length().greaterThanOrEqualTo(8))
+                .setMessage("Password must be at least 5 characters long")
+                .setCondition(passwordField.textProperty().length().greaterThanOrEqualTo(5))
                 .get();
 
         Constraint digitConstraint = Constraint.Builder.build()
@@ -118,13 +117,13 @@ public class Widgets {
         return validationLabel;
     }
 
-    public static ImageView createAnimePoster(HomePageModel model, double targetWidth, double targetHeight) {
+    public static ImageView createAnimePoster(AnimeProperty animeProperty, double targetWidth, double targetHeight) {
         ImageView animePoster = new ImageView();
         animePoster.setFitWidth(targetWidth);
         animePoster.setFitHeight(targetHeight);
         animePoster.setPreserveRatio(true);
         animePoster.setSmooth(true);
-        animePoster.imageProperty().bind(model.animeProperty().imageBinding());
+        animePoster.imageProperty().bind(animeProperty.imageBinding());
         return animePoster;
     }
 
@@ -138,6 +137,7 @@ public class Widgets {
             searchBar.setDisable(true);
             fetchAnimeList.accept(() -> searchBar.setDisable(false));
         });
+        searchBar.setId("search-bar");
 
         return searchBar;
     }
@@ -178,4 +178,5 @@ public class Widgets {
         paneLink.setAlignment(Pos.CENTER);
         return paneLink;
     }
+
 }

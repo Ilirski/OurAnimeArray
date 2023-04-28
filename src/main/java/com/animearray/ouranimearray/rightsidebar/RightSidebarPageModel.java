@@ -1,21 +1,54 @@
 package com.animearray.ouranimearray.rightsidebar;
 
-import com.animearray.ouranimearray.widgets.Anime;
-import com.animearray.ouranimearray.widgets.User;
-import com.animearray.ouranimearray.widgets.AnimeProperty;
-import com.animearray.ouranimearray.widgets.WatchStatus;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import com.animearray.ouranimearray.widgets.*;
+import javafx.beans.property.*;
 
 public class RightSidebarPageModel {
     private final AnimeProperty anime = new AnimeProperty();
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanProperty loggedIn = new SimpleBooleanProperty(false);
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
-    private final ObjectProperty<WatchStatus> watchStatus = new SimpleObjectProperty<>();
+    private final IntegerProperty userEpisodesWatched = new SimpleIntegerProperty(0);
+    private final ObjectProperty<WatchStatus> userWatchStatus = new SimpleObjectProperty<>();
     private final BooleanProperty watchStatusNotSet = new SimpleBooleanProperty(true);
+    private final UserAnimeProperty userAnimeData = new UserAnimeProperty();
+    private final IntegerProperty userScore = new SimpleIntegerProperty(0);
+
+    public int getUserScore() {
+        return userScore.get();
+    }
+
+    public void setUserScore(int userScore) {
+        this.userScore.set(userScore);
+    }
+
+    public IntegerProperty userScoreProperty() {
+        return userScore;
+    }
+
+    public UserAnime getUserAnimeData() {
+        return userAnimeData.get();
+    }
+
+    public void setUserAnimeData(UserAnime userAnimeData) {
+        this.userAnimeData.set(userAnimeData);
+    }
+
+    public UserAnimeProperty userAnimeDataProperty() {
+        return userAnimeData;
+    }
+
+    public int getUserEpisodesWatched() {
+        return userEpisodesWatched.get();
+    }
+
+    public void setUserEpisodesWatched(int userEpisodesWatched) {
+        this.userEpisodesWatched.set(userEpisodesWatched);
+    }
+
+    public IntegerProperty userEpisodesWatchedProperty() {
+        return userEpisodesWatched;
+    }
 
     public boolean isWatchStatusNotSet() {
         return watchStatusNotSet.get();
@@ -41,16 +74,16 @@ public class RightSidebarPageModel {
         return loggedIn;
     }
 
-    public WatchStatus getWatchStatus() {
-        return watchStatus.get();
+    public WatchStatus getUserWatchStatus() {
+        return userWatchStatus.get();
     }
 
-    public void setWatchStatus(WatchStatus watchStatus) {
-        this.watchStatus.set(watchStatus);
+    public void setUserWatchStatus(WatchStatus userWatchStatus) {
+        this.userWatchStatus.set(userWatchStatus);
     }
 
-    public ObjectProperty<WatchStatus> watchStatusProperty() {
-        return watchStatus;
+    public ObjectProperty<WatchStatus> userWatchStatusProperty() {
+        return userWatchStatus;
     }
 
     public Anime getAnime() {

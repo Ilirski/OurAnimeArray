@@ -72,9 +72,9 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
     private MigPane setupLoginPane(Consumer<Runnable> userFetcher) {
         MigPane loginPane = createMigPaneWithCenteredAlignment();
 
-        Label validationLabel = createValidationLabel(model.loginErrorMessageProperty());
-        MFXTextField usernameField = createUsernameField(model.usernameLoginProperty());
-        MFXPasswordField passwordField = createPasswordField(model.passwordLoginProperty());
+        var validationLabel = createValidationLabel(model.loginErrorMessageProperty());
+        var usernameField = createUsernameField(model.usernameLoginProperty());
+        var passwordField = createPasswordField(model.passwordLoginProperty());
 
         MFXButton loginButton = createLoginButton(usernameField, passwordField, userFetcher);
 
@@ -116,12 +116,7 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         loginButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> {
-                isFetchingUser.set(false);
-                if (!model.isLoggedIn()) {
-                    model.setLoginErrorMessage("Wrong username or password, please try again");
-                }
-            });
+            userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
         return loginButton;
@@ -137,16 +132,16 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
     private MigPane setupRegisterPane(Consumer<Runnable> userFetcher) {
         MigPane registerPane = createMigPaneWithCenteredAlignment();
 
-        Label validationLabel = createValidationLabel(model.registerErrorMessageProperty());
-        MFXTextField usernameField = createRegisterUsernameField();
+        var validationLabel = createValidationLabel(model.registerErrorMessageProperty());
+        var usernameField = createRegisterUsernameField();
         usernameField.textProperty().bindBidirectional(model.usernameRegisterProperty());
         addValidationListeners(model.registerErrorMessageProperty(), usernameField);
 
-        MFXPasswordField passwordField = createRegisterPasswordField();
+        var passwordField = createRegisterPasswordField();
         passwordField.textProperty().bindBidirectional(model.passwordRegisterProperty());
         addValidationListeners(model.registerErrorMessageProperty(), passwordField);
 
-        MFXButton registerButton = createRegisterButton(usernameField, passwordField, userFetcher);
+        var registerButton = createRegisterButton(usernameField, passwordField, userFetcher);
 
         addRegisterPaneComponents(registerPane, usernameField, passwordField, registerButton, validationLabel);
 
@@ -168,9 +163,7 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         registerButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> {
-                isFetchingUser.set(false);
-            });
+            userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
         return registerButton;

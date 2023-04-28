@@ -1,21 +1,32 @@
 package com.animearray.ouranimearray.leftsidebar;
 
+import com.animearray.ouranimearray.widgets.AnimeList;
+import com.animearray.ouranimearray.widgets.AnimeListCell;
+import com.animearray.ouranimearray.widgets.Widgets;
+import io.github.palexdev.materialfx.controls.MFXListView;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
-import javafx.scene.control.Label;
+import io.github.palexdev.materialfx.utils.others.FunctionalStringConverter;
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
-import net.miginfocom.layout.AC;
+import javafx.util.StringConverter;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import org.tbee.javafx.scene.layout.MigPane;
+
+import java.util.function.Consumer;
 
 import static com.animearray.ouranimearray.widgets.Widgets.createListToggle;
 
 public class LeftSidebarPageViewBuilder implements Builder<Region> {
     private final LeftSidebarPageModel model;
-    public LeftSidebarPageViewBuilder(LeftSidebarPageModel model) {
+    private final Consumer<Runnable> fetchAnimeList;
+    private final Consumer<Runnable> addAnimeToList;
+    public LeftSidebarPageViewBuilder(LeftSidebarPageModel model, Consumer<Runnable> fetchAnimeList, Consumer<Runnable> addAnimeToList) {
         this.model = model;
+        this.fetchAnimeList = fetchAnimeList;
+        this.addAnimeToList = addAnimeToList;
     }
 
     @Override
@@ -24,24 +35,39 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
                 new LC().insets("0").fill()
         );
 
-        ToggleGroup toggleGroup = new ToggleGroup();
+        MFXListView<AnimeList> animeListView = createAnimeListView();
 
-        MigPane migScrollPane = new MigPane(new LC().wrapAfter(1).fill());
-
-        var list1 = createListToggle("My Lists");
-        var list2 = createListToggle("Recommended");
-
-        toggleGroup.getToggles().addAll(list1, list2);
-
-        migScrollPane.add(list1, new CC().grow().span());
-        migScrollPane.add(list2, new CC().grow().span());
+        // When leftSideBarVisibleProperty is visible, refresh user's the anime list
+        model.leftSideBarVisibleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                fetchAnimeList.accept(() -> System.out.println("Anime List Fetched"));
+            }
+        });
 
         leftSideBar.getStyleClass().add("left-sidebar");
-        var scrollPane = new MFXScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setContent(migScrollPane);
 
-        leftSideBar.add(scrollPane, new CC().grow().push().maxWidth("100%"));
+        leftSideBar.add(animeListView, new CC().grow().push().maxWidth("100%"));
         return leftSideBar;
+    }
+
+    public MFXListView<AnimeList> createAnimeListView() {
+
+        // Creating the Anime List View
+        MFXListView<AnimeList> animeListView = new MFXListView<>(model.animeWatchListProperty());
+        StringConverter<AnimeList> converter = FunctionalStringConverter.to(animeList -> (animeList == null) ? "" : animeList.name());
+        animeListView.setCellFactory(animeList -> new AnimeListCell(animeListView, animeList, model.animeListToAddToProperty(), model.animeToAddProperty()));
+        animeListView.setConverter(converter);
+        animeListView.features().enableBounceEffect();
+        animeListView.features().enableSmoothScrolling(0.5);
+
+        // When animeToAddProperty is changed, add the anime to the list to be added to
+        model.animeToAddProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                addAnimeToList.accept(() -> System.out.println("Anime Added"));
+            }
+        });
+
+        return animeListView;
+
     }
 }
