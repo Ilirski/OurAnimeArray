@@ -1,13 +1,9 @@
 package com.animearray.ouranimearray.home;
 
 import com.animearray.ouranimearray.model.DatabaseFetcher;
-import com.animearray.ouranimearray.widgets.AccountType;
-import com.animearray.ouranimearray.widgets.User;
-import com.tobiasdiez.easybind.EasyBind;
+import com.animearray.ouranimearray.widgets.DAOs.AccountType;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import javafx.beans.binding.Bindings;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 public class HomePageInteractor {
     private final HomePageModel viewModel;

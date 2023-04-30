@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.search;
 
-import com.animearray.ouranimearray.widgets.Anime;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -11,6 +11,19 @@ public class SearchPageModel {
     private final ListProperty<Anime> animeList = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final AnimeProperty anime = new AnimeProperty();
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
+
+    public boolean isLoading() {
+        return loading.get();
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading.set(loading);
+    }
+
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
 
     public ObservableList<Anime> getAnimeList() {
         return animeList.get();

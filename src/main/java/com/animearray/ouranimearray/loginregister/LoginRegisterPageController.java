@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.loginregister;
 
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import com.animearray.ouranimearray.widgets.ControllerFX;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -38,6 +38,9 @@ public class LoginRegisterPageController implements ControllerFX {
             } else {
                 // If user is logged in, switch to search page
                 searchPageSelectedProperty.set(true);
+                // And clear the login fields
+                model.setUsernameLogin("");
+                model.setPasswordLogin("");
             }
             postFetchUsers.run();
         });
@@ -58,7 +61,7 @@ public class LoginRegisterPageController implements ControllerFX {
             postFetchUsers.run();
         });
         fetchTask.setOnFailed(event -> {
-            // Catch exception here
+            // Casting to SQLException to get the error code
             SQLException sqlException = (SQLException) fetchTask.getException();
             if (sqlException.getErrorCode() == 19) {
                 interactor.updateRegisterErrorMessage("ERROR: Username already taken.");

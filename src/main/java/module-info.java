@@ -23,4 +23,6 @@ module com.animearray.ouranimearray {
     opens com.animearray.ouranimearray.widgets to javafx.fxml;
     exports com.animearray.ouranimearray.search;
     opens com.animearray.ouranimearray.search to javafx.fxml;
+    exports com.animearray.ouranimearray.widgets.DAOs;
+    opens com.animearray.ouranimearray.widgets.DAOs to javafx.fxml;
 }

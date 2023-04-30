@@ -1,5 +1,8 @@
 package com.animearray.ouranimearray.widgets;
 
+import com.animearray.ouranimearray.widgets.DAOs.Score;
+import com.animearray.ouranimearray.widgets.DAOs.UserAnime;
+import com.animearray.ouranimearray.widgets.DAOs.WatchStatus;
 import javafx.beans.property.*;
 
 public class UserAnimeProperty extends ObjectPropertyBase<UserAnime> {
@@ -22,7 +25,7 @@ public class UserAnimeProperty extends ObjectPropertyBase<UserAnime> {
         this.watchedEpisodes = new SimpleObjectProperty<>(userAnime != null ? userAnime.watchedEpisodes() : 0);
         this.status = new SimpleObjectProperty<>(userAnime != null ? userAnime.watchStatus() : null);
 
-        // Add a listener such that when the current AnimeProperty changes, this property is updated
+        // Add a listener such that when the current AnimeProperty changes, its properties is updated
         this.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 this.userId.set(newValue.userId());

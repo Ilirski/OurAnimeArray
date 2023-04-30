@@ -1,9 +1,7 @@
 package com.animearray.ouranimearray.leftsidebar;
 
-import com.animearray.ouranimearray.loginregister.LoginRegisterPageInteractor;
-import com.animearray.ouranimearray.loginregister.LoginRegisterPageModel;
-import com.animearray.ouranimearray.widgets.AccountType;
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.AccountType;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

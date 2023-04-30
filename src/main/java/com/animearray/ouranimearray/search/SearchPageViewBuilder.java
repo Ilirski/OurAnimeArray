@@ -1,8 +1,13 @@
 package com.animearray.ouranimearray.search;
 
-import com.animearray.ouranimearray.widgets.Anime;
+import com.animearray.ouranimearray.widgets.AnimeProperty;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.AnimeGridCell;
+import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Builder;
 import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
@@ -10,8 +15,10 @@ import net.miginfocom.layout.LC;
 import org.controlsfx.control.GridView;
 import org.tbee.javafx.scene.layout.MigPane;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
+import static com.animearray.ouranimearray.widgets.Widgets.createAnimeGridView;
 import static com.animearray.ouranimearray.widgets.Widgets.createSearchBar;
 
 public class SearchPageViewBuilder implements Builder<Region> {
@@ -29,25 +36,30 @@ public class SearchPageViewBuilder implements Builder<Region> {
                 new AC().grow(),
                 new AC().grow());
 
-        searchPane.add(createAnimeGridView(fetchAnimeList), new CC().dockNorth());
+        searchPane.add(createSearchGrid(fetchAnimeList), new CC().grow());
         return searchPane;
     }
 
-    private MigPane createAnimeGridView(Consumer<Runnable> fetchAnimeList) {
+    private Region createSearchGrid(Consumer<Runnable> fetchAnimeList) {
+        StackPane stackPane = new StackPane();
         MigPane animeGridPane = new MigPane(new LC().fill());
 
-        GridView<Anime> animeGridView = new GridView<>(model.animeListProperty());
-        animeGridView.setCellFactory(gridView -> new AnimeGridCell(model.animeProperty(), model.rightSideBarVisibleProperty(), true));
-        // We want image width : height -> 227.0 : 350.0
-        animeGridView.setCellWidth(225);
-        animeGridView.setCellHeight(350);
-        animeGridView.setHorizontalCellSpacing(10);
-        animeGridView.setVerticalCellSpacing(20);
+        GridView<Anime> animeGridView = createAnimeGridView(model.animeListProperty(), model.animeProperty(),model.rightSideBarVisibleProperty());
+
+        // Add loading spinner
+        MigPane loadingPane = new MigPane(new LC().fill());
+        var loadingSpinner = new MFXProgressSpinner();
+        loadingPane.visibleProperty().bind(model.loadingProperty());
+        loadingPane.add(loadingSpinner, new CC().alignX("center").alignY("center").width("15%").height("15%"));
+        stackPane.getChildren().addAll(animeGridPane, loadingPane);
+
+        loadingSpinner.setId("loading-spinner");
+        loadingPane.setId("loading-pane");
 
         // So that not on the window edge
-        animeGridPane.add(createSearchBar(model.searchQueryProperty(), fetchAnimeList),
+        animeGridPane.add(createSearchBar(model.searchQueryProperty(), model.loadingProperty(), fetchAnimeList),
                 new CC().wrap().width("50%").height("10").alignX("center").alignY("top").gap("0", "0", "10", "5"));
-        animeGridPane.add(animeGridView, new CC().grow());
-        return animeGridPane;
+        animeGridPane.add(animeGridView, new CC().grow().pushY());
+        return stackPane;
     }
 }

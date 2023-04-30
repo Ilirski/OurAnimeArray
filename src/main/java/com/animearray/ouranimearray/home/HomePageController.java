@@ -1,5 +1,6 @@
 package com.animearray.ouranimearray.home;
 
+import com.animearray.ouranimearray.animedatabase.AnimeDatabasePageController;
 import com.animearray.ouranimearray.leftsidebar.LeftSidebarPageController;
 import com.animearray.ouranimearray.list.ListPageController;
 import com.animearray.ouranimearray.loginregister.LoginRegisterPageController;
@@ -12,9 +13,11 @@ import javafx.util.Builder;
 
 public class HomePageController implements ControllerFX {
     private final Builder<Region> viewBuilder;
+    private final HomePageInteractor interactor;
 
     public HomePageController() {
         HomePageModel model = new HomePageModel();
+        interactor = new HomePageInteractor(model);
         viewBuilder = new HomePageViewBuilder(model,
                 new SearchPageController(model.animeProperty(),
                         model.rightSideBarVisibleProperty()).getViewBuilder(),
@@ -26,8 +29,13 @@ public class HomePageController implements ControllerFX {
                         model.rightSideBarVisibleProperty()).getViewBuilder(),
                 new LeftSidebarPageController(model.currentUserProperty(),
                         model.leftSideBarVisibleProperty(),
-                        model.listPageSelectedProperty()).getViewBuilder(),
-                new ListPageController(model.listPageSelectedProperty()).getViewBuilder()
+                        model.listPageSelectedProperty(),
+                        model.listIdProperty()).getViewBuilder(),
+                new ListPageController(model.listPageSelectedProperty(),
+                        model.animeProperty(),
+                        model.rightSideBarVisibleProperty(),
+                        model.listIdProperty()).getViewBuilder(),
+                new AnimeDatabasePageController().getViewBuilder()
         );
 
         model.adminProperty().addListener(observable -> System.out.println("Admin: " + model.adminProperty().get()));

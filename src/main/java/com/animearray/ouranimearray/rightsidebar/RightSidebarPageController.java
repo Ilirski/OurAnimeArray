@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.rightsidebar;
 
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
 import com.animearray.ouranimearray.widgets.ControllerFX;
 import javafx.beans.property.BooleanProperty;

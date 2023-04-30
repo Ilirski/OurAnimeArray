@@ -25,9 +25,20 @@ public class Main extends Application {
         Scene scene = new Scene(new HomePageController().getViewBuilder(), 1200, 600);
 
         // Styling
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("stylesheet.css")).toExternalForm());
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("tooltip.css")).toExternalForm());
+        scene.getStylesheets().addAll(
+        );
+
+        scene.getStylesheets().addAll(
+                getResourceUrl("stylesheet.css"),
+                getResourceUrl("tooltip.css"),
+                getResourceUrl("spinner.css"),
+                getResourceUrl("leftsidebar.css"),
+                getResourceUrl("rightsidebar.css"),
+                getResourceUrl("navbar.css")
+        );
+
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/rimuru-thumbnail.jpg")).toString()));
+
         stage.setScene(scene);
 
         // Don't forget to remove below!!
@@ -35,6 +46,9 @@ public class Main extends Application {
         stage.show();
     }
 
+    private String getResourceUrl(String fileName) {
+        return Objects.requireNonNull(getClass().getResource(fileName)).toExternalForm();
+    }
 
     public static void main(String[] args) {
         launch();

@@ -1,0 +1,44 @@
+.navbar {
+    -fx-background-color: #2967e3;
+}
+
+.navbar .mfx-rectangle-toggle-node {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-pref-height: 40;
+
+    -fx-font-size: 13;
+    -fx-text-fill: white;
+}
+
+.navbar .mfx-rectangle-toggle-node:hover {
+    -fx-background-color: #5987ea;
+    -fx-background-radius: 5;
+    -fx-border-color: transparent;
+}
+
+.navbar .mfx-rectangle-toggle-node .mfx-text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.navbar .mfx-rectangle-toggle-node .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-text-fill: #2967e3;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected .selection-rectangle {
+    -fx-stroke: transparent;
+    -fx-text-fill: #2967e3;
+}
+
+.navbar .mfx-rectangle-toggle-node:selected .mfx-font-icon {
+    -mfx-color: #2967e3;
+}

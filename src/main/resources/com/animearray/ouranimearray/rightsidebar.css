@@ -1,0 +1,44 @@
+.right-sidebar {
+    -fx-background-color: #3f3f3f;
+}
+
+.right-sidebar .mfx-combo-box {
+    -fx-background-color: #3f3f3f;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: white;
+}
+
+.right-sidebar .mfx-combo-box .floating-text {
+    -fx-text-fill: white;
+}
+
+.right-sidebar .mfx-combo-box .caret .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.right-sidebar .mfx-combo-box .combo-popup .virtual-flow {
+    -fx-background-color: #3f3f3f;
+    -fx-border-color: #313030;
+    -fx-text-fill: white;
+}
+
+.right-sidebar .mfx-spinner {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.right-sidebar .mfx-spinner .mfx-icon-wrapper {
+    -fx-background-color: derive(#2967e3, 100%);
+    -mfx-size: 27;
+}
+
+.right-sidebar .mfx-spinner .mfx-icon-wrapper:hover {
+    -fx-background-color: derive(#2967e3, 50%);
+}
+
+.right-sidebar .mfx-spinner .mfx-icon-wrapper .mfx-font-icon {
+    -mfx-color: #2967e3;
+}
+
+
+

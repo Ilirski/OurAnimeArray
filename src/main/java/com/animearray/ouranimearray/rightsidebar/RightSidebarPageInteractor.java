@@ -1,8 +1,7 @@
 package com.animearray.ouranimearray.rightsidebar;
 
 import com.animearray.ouranimearray.model.DatabaseFetcher;
-import com.animearray.ouranimearray.widgets.UserAnime;
-import com.animearray.ouranimearray.widgets.WatchStatus;
+import com.animearray.ouranimearray.widgets.DAOs.UserAnime;
 
 public class RightSidebarPageInteractor {
     private final RightSidebarPageModel viewModel;

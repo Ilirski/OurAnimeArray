@@ -1,7 +1,7 @@
 package com.animearray.ouranimearray.loginregister;
 
 import com.animearray.ouranimearray.model.DatabaseFetcher;
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -1,8 +1,9 @@
 package com.animearray.ouranimearray.leftsidebar;
 
 import com.animearray.ouranimearray.model.DatabaseFetcher;
-import com.animearray.ouranimearray.widgets.AnimeList;
+import com.animearray.ouranimearray.widgets.DAOs.AnimeList;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class LeftSidebarPageInteractor {
@@ -29,5 +30,13 @@ public class LeftSidebarPageInteractor {
         // Clear the animeToAdd and animeListToAddTo properties
         viewModel.setAnimeToAdd(null);
         viewModel.setAnimeListToAddTo(null);
+    }
+
+    public void createNewAnimeList() throws SQLException {
+        databaseFetcher.createNewAnimeList(viewModel.getCurrentUser().id(), viewModel.getAnimeListNameToCreate());
+    }
+
+    public void updateNotification(String notificationMessage) {
+        viewModel.notificationProperty().set(notificationMessage);
     }
 }
