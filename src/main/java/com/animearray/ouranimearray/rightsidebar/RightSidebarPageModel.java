@@ -1,6 +1,10 @@
 package com.animearray.ouranimearray.rightsidebar;
 
 import com.animearray.ouranimearray.widgets.*;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
+import com.animearray.ouranimearray.widgets.DAOs.User;
+import com.animearray.ouranimearray.widgets.DAOs.UserAnime;
+import com.animearray.ouranimearray.widgets.DAOs.WatchStatus;
 import javafx.beans.property.*;
 
 public class RightSidebarPageModel {

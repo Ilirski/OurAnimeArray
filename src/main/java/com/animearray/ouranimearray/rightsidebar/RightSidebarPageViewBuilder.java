@@ -1,16 +1,13 @@
 package com.animearray.ouranimearray.rightsidebar;
 
-import com.animearray.ouranimearray.widgets.Score;
-import com.animearray.ouranimearray.widgets.WatchStatus;
+import com.animearray.ouranimearray.widgets.DAOs.Score;
+import com.animearray.ouranimearray.widgets.DAOs.WatchStatus;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.controls.MFXSpinner;
 import io.github.palexdev.materialfx.controls.models.spinner.IntegerSpinnerModel;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -97,6 +94,7 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         // Score
         MFXComboBox<Score> scoreComboBox = createScoreComboBox();
 
+        // Notify model when animeProperty is changed
         model.animeProperty().addListener(observable -> {
             if (model.getAnime() == null || !model.isLoggedIn()) {
                 return;
@@ -121,6 +119,7 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         animeSynopsis.setTextAlignment(TextAlignment.JUSTIFY);
         animeSynopsis.setWrapText(true);
 
+        // Exit button
         MFXButton button = new MFXButton("Exit");
         button.setOnAction(event -> {
             model.setRightSideBarVisible(false);
@@ -153,21 +152,38 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         MFXSpinner<Integer> episodesWatchedSpinner = new MFXSpinner<>();
         episodesWatchedSpinner.setOrientation(Orientation.HORIZONTAL);
         episodesWatchedSpinner.setPromptText("Episodes Watched");
+
+        // Set spinner model and bind to user anime data
         var episodesWatchedSpinnerModel = new IntegerSpinnerModel();
         episodesWatchedSpinner.setEditable(true);
         episodesWatchedSpinnerModel.maxProperty().bind(model.animeProperty().episodesBinding());
-//        model.userAnimeDataProperty().addListener(observable -> {
-//            var watchedEpisodes = model.getUserAnimeData().watchedEpisodes();
-//            if (watchedEpisodes == null || !model.isLoggedIn()) {
-//                return;
-//            }
-//            episodesWatchedSpinnerModel.setValue(watchedEpisodes);
-//        });
         episodesWatchedSpinnerModel.valueProperty().bindBidirectional(model.userAnimeDataProperty().watchedEpisodesProperty());
         episodesWatchedSpinner.setSpinnerModel(episodesWatchedSpinnerModel);
+
+        // Handles when user types in the spinner
+        episodesWatchedSpinner.setOnCommit(text -> {
+            if (text.matches("\\d+")) {
+                // Check if text is within bounds
+                int episode = Integer.parseInt(text);
+                if (episode <= model.getAnime().episodes()) {
+                    episodesWatchedSpinner.setValue(episode);
+                }
+            }
+        });
+        model.userAnimeDataProperty().statusProperty().addListener(observable -> {
+            WatchStatus watchStatus = model.getUserAnimeData().watchStatus();
+            if (watchStatus == WatchStatus.COMPLETED) {
+                // If anime is completed, set episodes watched to total episodes
+                System.out.println(model.getAnime().episodes());
+                episodesWatchedSpinner.setValue(model.getAnime().episodes());
+            }
+        });
+
+        // Set text transformer to show "Not Started" when 0 episodes are watched
         episodesWatchedSpinner.setTextTransformer((focused, text) -> {
             if (!focused) {
                 if (text.equals("0")) return "Not Started";
+                if (text.equals("1")) return text + "/" + model.getAnime().episodes() + " episode";
                 return text + "/" + model.getAnime().episodes() + " episodes";
             } else {
                 return text;
@@ -182,8 +198,12 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
 
     private MFXComboBox<Score> createScoreComboBox() {
         MFXComboBox<Score> scoreComboBox = new MFXComboBox<>();
-        scoreComboBox.setFloatingText("Rating");
+        scoreComboBox.setFloatingText("Score");
         scoreComboBox.getItems().setAll(Score.values());
+        scoreComboBox.valueProperty().bindBidirectional(model.userAnimeDataProperty().scoreProperty());
+        scoreComboBox.visibleProperty().bind(model.loggedInProperty());
+        scoreComboBox.setScrollOnOpen(false);
+        scoreComboBox.setContextMenuDisabled(true);
         scoreComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Score object) {
@@ -195,7 +215,6 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 return null;
             }
         });
-        scoreComboBox.setContextMenuDisabled(true);
 
         scoreComboBox.setOnAction(event -> {
             Score score = scoreComboBox.getValue();
@@ -208,9 +227,6 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 scoreComboBox.setDisable(false);
             });
         });
-        scoreComboBox.valueProperty().bindBidirectional(model.userAnimeDataProperty().scoreProperty());
-        scoreComboBox.visibleProperty().bind(model.loggedInProperty());
-        scoreComboBox.setScrollOnOpen(false);
 
         return scoreComboBox;
     }
@@ -219,6 +235,11 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         MFXComboBox<WatchStatus> statusComboBox = new MFXComboBox<>();
         statusComboBox.setFloatingText("Status");
         statusComboBox.getItems().setAll(WatchStatus.values());
+        statusComboBox.visibleProperty().bind(model.loggedInProperty());
+        statusComboBox.valueProperty().bindBidirectional(model.userAnimeDataProperty().statusProperty());
+        statusComboBox.setScrollOnOpen(false);
+        statusComboBox.setContextMenuDisabled(true);
+
         statusComboBox.setOnAction(event -> {
             WatchStatus watchStatus = statusComboBox.getValue();
             if (statusComboBox.getValue() == null || watchStatus == model.getUserAnimeData().watchStatus()) {
@@ -227,7 +248,6 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
             model.setUserWatchStatus(watchStatus);
             statusComboBox.setDisable(true);
             setAnimeStatus.accept(() -> {
-                System.out.println("Status set");
                 statusComboBox.setDisable(false);
             });
         });
@@ -242,10 +262,6 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 return null;
             }
         });
-        statusComboBox.setContextMenuDisabled(true);
-        statusComboBox.visibleProperty().bind(model.loggedInProperty());
-        statusComboBox.valueProperty().bindBidirectional(model.userAnimeDataProperty().statusProperty());
-        statusComboBox.setScrollOnOpen(false);
         return statusComboBox;
     }
 }

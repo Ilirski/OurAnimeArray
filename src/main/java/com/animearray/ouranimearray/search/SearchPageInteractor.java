@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.search;
 
-import com.animearray.ouranimearray.widgets.Anime;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.model.DatabaseFetcher;
 
 import java.util.List;
@@ -15,8 +15,7 @@ public class SearchPageInteractor {
     }
 
     public void searchAnime() {
-        String searchQuery = viewModel.getSearchQuery();
-        animeListData = databaseFetcher.searchAnime(searchQuery);
+        animeListData = databaseFetcher.searchAnime(viewModel.getSearchQuery());
     }
 
     public void updateAnimeListFromSearch() {

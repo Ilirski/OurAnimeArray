@@ -1,10 +1,9 @@
 package com.animearray.ouranimearray.widgets;
 
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Binding;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 
 import java.util.Collections;

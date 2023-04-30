@@ -1,6 +1,6 @@
 package com.animearray.ouranimearray.profile;
 
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import com.animearray.ouranimearray.widgets.ControllerFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.layout.Region;

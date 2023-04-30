@@ -1,7 +1,7 @@
 .mfx-tooltip .container {
-    -fx-background-color: white;
+    -fx-background-color: #1d1d1d;
     -fx-background-radius: 5;
-    -fx-border-color: lightgray;
+    -fx-border-color: #333333;
     -fx-border-radius: 5;
     -fx-max-width: 400;
 }
@@ -9,6 +9,6 @@
 .mfx-tooltip .container .label {
     -fx-padding: 5;
     -fx-font-family: "Open Sans Regular";
-    -fx-text-fill: black;
+    -fx-text-fill: white;
     -fx-graphic-text-gap: 10;
 }

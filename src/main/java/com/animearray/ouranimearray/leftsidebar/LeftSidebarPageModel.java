@@ -1,9 +1,8 @@
 package com.animearray.ouranimearray.leftsidebar;
 
-import com.animearray.ouranimearray.widgets.Anime;
-import com.animearray.ouranimearray.widgets.AnimeList;
-import com.animearray.ouranimearray.widgets.AnimeProperty;
-import com.animearray.ouranimearray.widgets.User;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
+import com.animearray.ouranimearray.widgets.DAOs.AnimeList;
+import com.animearray.ouranimearray.widgets.DAOs.User;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +15,45 @@ public class LeftSidebarPageModel {
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanProperty loggedIn = new SimpleBooleanProperty(false);
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
+    private final StringProperty listId = new SimpleStringProperty();
+    private final StringProperty animeListNameToCreate = new SimpleStringProperty();
+    private final StringProperty notification = new SimpleStringProperty();
+
+    public String getNotification() {
+        return notification.get();
+    }
+
+    public void setNotification(String notification) {
+        this.notification.set(notification);
+    }
+
+    public StringProperty notificationProperty() {
+        return notification;
+    }
+
+    public String getAnimeListNameToCreate() {
+        return animeListNameToCreate.get();
+    }
+
+    public void setAnimeListNameToCreate(String animeListNameToCreate) {
+        this.animeListNameToCreate.set(animeListNameToCreate);
+    }
+
+    public StringProperty animeListNameToCreateProperty() {
+        return animeListNameToCreate;
+    }
+
+    public String getListId() {
+        return listId.get();
+    }
+
+    public void setListId(String listId) {
+        this.listId.set(listId);
+    }
+
+    public StringProperty listIdProperty() {
+        return listId;
+    }
 
     public boolean isListPageSelected() {
         return listPageSelected.get();

@@ -1,5 +1,6 @@
 package com.animearray.ouranimearray.widgets;
 
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import io.github.palexdev.materialfx.controls.MFXTooltip;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;
@@ -40,6 +41,7 @@ public class AnimeGridCell extends GridCell<Anime> {
         // BY THE GEOMETRIC SHAPE OF THE NODE
         // See https://stackoverflow.com/questions/24607969/mouse-events-get-ignored-on-the-underlying-layer
         setPickOnBounds(false);
+        gridCell.setPickOnBounds(false);
 
         // https://stackoverflow.com/questions/27064975/rotate-a-dragboard-javafx-8
         // https://stackoverflow.com/questions/22424082/drag-and-drop-vbox-element-with-show-snapshot-in-javafx
@@ -60,7 +62,7 @@ public class AnimeGridCell extends GridCell<Anime> {
                     }
                 });
 
-        // https://stackoverflow.com/questions/26610660/how-to-drag-a-javafx-node-and-detect-a-drop-event-outside-the-javafx-windows
+        // Allow dragging of the grid cell (https://stackoverflow.com/a/26611309/17771525)
 
         setOnDragDetected(event -> {
             getScene().setCursor(Cursor.CLOSED_HAND);
@@ -84,6 +86,42 @@ public class AnimeGridCell extends GridCell<Anime> {
                 this.getScene().setCursor(Cursor.DEFAULT);
             }
         });
+
+        // Tooltip for anime title
+        MFXTooltip tooltip = new MFXTooltip(gridCell);
+        tooltip.textProperty().bind(imageLabel.textProperty());
+        tooltip.setOnShown(e -> {
+            System.out.println(tooltip.getText() + " shown");
+        });
+        tooltip.install();
+    }
+
+    @Override
+    protected void updateItem(Anime item, boolean empty) {
+
+        super.updateItem(item, empty);
+
+        if (empty || item == null) {
+            setGraphic(null);
+        } else {
+            Image animePoster = item.image();
+            String animeTitle = item.title();
+
+            if (preserveImageProperties) {
+                Rectangle2D cropRect = calculateImageCrop(animePoster, targetWidth, targetHeight);
+
+                imageView.setViewport(cropRect);
+                imageView.setFitWidth(targetWidth);
+                imageView.setFitHeight(targetHeight);
+                imageView.setSmooth(true);
+                imageView.setImage(animePoster);
+            }
+
+            double leftPaddingRequired = calculateLeftPaddingRequired(targetWidth);
+            setPadding(new Insets(0, 0, 0, leftPaddingRequired));
+            imageLabel.setText(animeTitle);
+            setGraphic(gridCell);
+        }
     }
 
     public static Rectangle2D calculateImageCrop(Image image, double targetWidth, double targetHeight) {
@@ -113,36 +151,6 @@ public class AnimeGridCell extends GridCell<Anime> {
 
         // Create a new cropped image using the calculated dimensions
         return new Rectangle2D(cropX, cropY, cropWidth, cropHeight);
-    }
-
-    @Override
-    protected void updateItem(Anime item, boolean empty) {
-
-        super.updateItem(item, empty);
-
-        if (empty || item == null) {
-            setGraphic(null);
-        } else {
-            Image animePoster = item.image();
-            String animeTitle = item.title();
-
-            if (preserveImageProperties) {
-
-                Rectangle2D cropRect = calculateImageCrop(animePoster, targetWidth, targetHeight);
-
-                imageView.setViewport(cropRect);
-                imageView.setFitWidth(targetWidth);
-                imageView.setFitHeight(targetHeight);
-                imageView.setSmooth(true);
-                imageView.setImage(animePoster);
-            }
-
-            double leftPaddingRequired = calculateLeftPaddingRequired(targetWidth);
-            setPadding(new Insets(0, 0, 0, leftPaddingRequired));
-            imageLabel.setText(animeTitle);
-            MFXTooltip.of(this, animeTitle).install();
-            setGraphic(gridCell);
-        }
     }
 
     private void addPreview() {

@@ -1,0 +1,18 @@
+#loading-spinner {
+    -mfx-color1: #0000ff;
+    -mfx-color2: #00ffd0;
+    -mfx-color3: #00a6ff;
+    -mfx-color4: #00bbff;
+}
+
+#loading-spinner .arc {
+    -fx-stroke-width: 5;
+}
+
+#loading-spinner .track {
+    -fx-stroke-width: 5;
+}
+
+#loading-pane {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}

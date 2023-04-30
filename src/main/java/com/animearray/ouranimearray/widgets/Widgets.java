@@ -1,6 +1,7 @@
 package com.animearray.ouranimearray.widgets;
 
 import animatefx.animation.Wobble;
+import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXRectangleToggleNode;
@@ -11,6 +12,8 @@ import io.github.palexdev.materialfx.font.MFXFontIcon;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -19,6 +22,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextAlignment;
+import org.controlsfx.control.GridView;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -127,7 +131,8 @@ public class Widgets {
         return animePoster;
     }
 
-    public static MFXTextField createSearchBar(StringProperty searchQueryProperty, Consumer<Runnable> fetchAnimeList) {
+    public static MFXTextField createSearchBar(StringProperty searchQueryProperty, BooleanProperty loadingProperty,
+                                               Consumer<Runnable> fetchAnimeList) {
         MFXTextField searchBar = new MFXTextField();
         searchBar.setFloatMode(FloatMode.BORDER);
         searchBar.setFloatingText("Search");
@@ -135,7 +140,11 @@ public class Widgets {
         searchBar.textProperty().bindBidirectional(searchQueryProperty);
         searchBar.setOnAction(event -> {
             searchBar.setDisable(true);
-            fetchAnimeList.accept(() -> searchBar.setDisable(false));
+            loadingProperty.set(true);
+            fetchAnimeList.accept(() -> {
+                searchBar.setDisable(false);
+                loadingProperty.set(false);
+            });
         });
         searchBar.setId("search-bar");
 
@@ -179,4 +188,14 @@ public class Widgets {
         return paneLink;
     }
 
+    public static GridView<Anime> createAnimeGridView(ListProperty<Anime> animeListProperty, AnimeProperty animeProperty, BooleanProperty rightSideBarVisibleProperty) {
+        GridView<Anime> animeGridView = new GridView<>(animeListProperty);
+        animeGridView.setCellFactory(gridView -> new AnimeGridCell(animeProperty, rightSideBarVisibleProperty, true));
+        // We want image width : height -> 227.0 : 350.0
+        animeGridView.setCellWidth(225);
+        animeGridView.setCellHeight(350);
+        animeGridView.setHorizontalCellSpacing(10);
+        animeGridView.setVerticalCellSpacing(20);
+        return animeGridView;
+    }
 }
