@@ -1,22 +1,82 @@
 package com.animearray.ouranimearray.rightsidebar;
 
 import com.animearray.ouranimearray.widgets.*;
-import com.animearray.ouranimearray.widgets.DAOs.Anime;
-import com.animearray.ouranimearray.widgets.DAOs.User;
-import com.animearray.ouranimearray.widgets.DAOs.UserAnime;
-import com.animearray.ouranimearray.widgets.DAOs.WatchStatus;
+import com.animearray.ouranimearray.widgets.DAOs.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class RightSidebarPageModel {
     private final AnimeProperty anime = new AnimeProperty();
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
+    private final BooleanProperty admin = new SimpleBooleanProperty(false);
     private final BooleanProperty loggedIn = new SimpleBooleanProperty(false);
-    private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty rightSidebarVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty adminRightSidebarVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty userRightSidebarVisible = new SimpleBooleanProperty(true);
     private final IntegerProperty userEpisodesWatched = new SimpleIntegerProperty(0);
     private final ObjectProperty<WatchStatus> userWatchStatus = new SimpleObjectProperty<>();
     private final BooleanProperty watchStatusNotSet = new SimpleBooleanProperty(true);
     private final UserAnimeProperty userAnimeData = new UserAnimeProperty();
     private final IntegerProperty userScore = new SimpleIntegerProperty(0);
+    private final ObjectProperty<AnimeDAO> animeToCreateOrModify = new SimpleObjectProperty<>();
+    private final ListProperty<Genre> genres = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public boolean isAdmin() {
+        return admin.get();
+    }
+
+    public BooleanProperty adminProperty() {
+        return admin;
+    }
+
+    public boolean isAdminRightSidebarVisible() {
+        return adminRightSidebarVisible.get();
+    }
+
+    public void setAdminRightSidebarVisible(boolean adminRightSidebarVisible) {
+        this.adminRightSidebarVisible.set(adminRightSidebarVisible);
+    }
+
+    public BooleanProperty adminRightSidebarVisibleProperty() {
+        return adminRightSidebarVisible;
+    }
+
+    public boolean isUserRightSidebarVisible() {
+        return userRightSidebarVisible.get();
+    }
+
+    public void setUserRightSidebarVisible(boolean userRightSidebarVisible) {
+        this.userRightSidebarVisible.set(userRightSidebarVisible);
+    }
+
+    public BooleanProperty userRightSidebarVisibleProperty() {
+        return userRightSidebarVisible;
+    }
+
+    public ObservableList<Genre> getGenres() {
+        return genres.get();
+    }
+
+    public void setGenres(ObservableList<Genre> genres) {
+        this.genres.set(genres);
+    }
+
+    public ListProperty<Genre> genresProperty() {
+        return genres;
+    }
+
+    public AnimeDAO getAnimeToCreateOrModify() {
+        return animeToCreateOrModify.get();
+    }
+
+    public void setAnimeToCreateOrModify(AnimeDAO animeToCreateOrModify) {
+        this.animeToCreateOrModify.set(animeToCreateOrModify);
+    }
+
+    public ObjectProperty<AnimeDAO> animeToCreateOrModifyProperty() {
+        return animeToCreateOrModify;
+    }
 
     public int getUserScore() {
         return userScore.get();
@@ -113,15 +173,15 @@ public class RightSidebarPageModel {
     }
 
 
-    public boolean isRightSideBarVisible() {
-        return rightSideBarVisible.get();
+    public boolean getRightSidebarVisible() {
+        return rightSidebarVisible.get();
     }
 
-    public void setRightSideBarVisible(boolean rightSideBarVisible) {
-        this.rightSideBarVisible.set(rightSideBarVisible);
+    public void setRightSidebarVisible(boolean rightSidebarVisible) {
+        this.rightSidebarVisible.set(rightSidebarVisible);
     }
 
-    public BooleanProperty rightSideBarVisibleProperty() {
-        return rightSideBarVisible;
+    public BooleanProperty rightSidebarVisibleProperty() {
+        return rightSidebarVisible;
     }
 }

@@ -33,4 +33,8 @@ public class ListPageInteractor {
     public void updateUserListDetails() {
         viewModel.setUserList(userListData);
     }
+
+    public void removeAnimeFromList() {
+        databaseFetcher.removeAnimeFromList(viewModel.getAnimeIdToRemove(), viewModel.getListId());
+    }
 }

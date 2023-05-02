@@ -16,7 +16,7 @@ public class ListPageController implements ControllerFX {
                               BooleanProperty rightSideBarVisibleProperty, StringProperty listIdProperty) {
         var model = new ListPageModel();
         interactor = new ListPageInteractor(model);
-        viewBuilder = new ListPageViewBuilder(model, this::fetchAnimeList, this::fetchUserListDetails);
+        viewBuilder = new ListPageViewBuilder(model, this::fetchAnimeList, this::fetchUserListDetails, this::removeAnimeFromList);
 
         // Bind and share properties
         model.listPageSelectedProperty().bindBidirectional(listPageSelectedProperty);
@@ -49,12 +49,33 @@ public class ListPageController implements ControllerFX {
                 return null;
             }
         };
+        // Run in either case (success or failure)
+        // Probably not good practice, but it works
         fetchTask.setOnSucceeded(event -> {
+            interactor.updateUserListDetails();
+            postFetchUserListDetails.run();
+        });
+        fetchTask.setOnFailed(event -> {
             interactor.updateUserListDetails();
             postFetchUserListDetails.run();
         });
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
+    }
+
+        public void removeAnimeFromList(Runnable postAnimeListRemove) {
+        Task<Void> removeTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.removeAnimeFromList();
+                return null;
+            }
+        };
+        removeTask.setOnSucceeded(event -> {
+            postAnimeListRemove.run();
+        });
+        Thread removeThread = new Thread(removeTask);
+        removeThread.start();
     }
     @Override
     public Region getViewBuilder() {

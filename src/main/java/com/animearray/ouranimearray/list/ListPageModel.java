@@ -15,6 +15,19 @@ public class ListPageModel {
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
     private final UserListProperty userList = new UserListProperty();
     private final StringProperty listId = new SimpleStringProperty("");
+    private final StringProperty animeIdToRemove = new SimpleStringProperty("");
+
+    public String getAnimeIdToRemove() {
+        return animeIdToRemove.get();
+    }
+
+    public void setAnimeIdToRemove(String animeIdToRemove) {
+        this.animeIdToRemove.set(animeIdToRemove);
+    }
+
+    public StringProperty animeIdToRemoveProperty() {
+        return animeIdToRemove;
+    }
 
     public UserList getUserList() {
         return userList.get();

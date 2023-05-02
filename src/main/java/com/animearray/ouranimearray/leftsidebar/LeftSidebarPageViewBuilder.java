@@ -65,15 +65,15 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
         addNewAnimeListField.setOnAction(event -> {
             model.setNotification("");
         });
-        addNewListPane.visibleProperty().bind(model.notificationProperty().isNotEmpty());
 
         var notificationLabel = new Label();
         notificationLabel.textProperty().bindBidirectional(model.notificationProperty());
+        notificationLabel.visibleProperty().bind(model.notificationProperty().isNotEmpty());
 
         var addNewListButton = new MFXButton("Add");
         addNewListButton.disableProperty().bind(model.animeListNameToCreateProperty().length().lessThan(5));
         addNewListButton.setOnAction(event -> {
-            createNewAnimeList.accept(() -> System.out.println("New List Created"));
+            createNewAnimeList.accept(() -> fetchAnimeList.accept(() -> System.out.println("Anime List Fetched")));
         });
 
         addNewListPane.add(addNewAnimeListField, new CC().grow().wrap());
@@ -100,7 +100,7 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
         MFXListView<AnimeList> animeListView = new MFXListView<>(model.animeWatchListProperty());
         StringConverter<AnimeList> converter = FunctionalStringConverter.to(animeList -> (animeList == null) ? "" : animeList.name());
         animeListView.setCellFactory(animeList -> new AnimeListCell(animeListView, animeList, model.animeListToAddToProperty(),
-                model.animeToAddProperty(), model.listPageSelectedProperty(), model.listIdProperty()));
+                model.animeToAddProperty(), model.listPageSelectedProperty(), model.listIdProperty(), addAnimeToList, fetchAnimeList));
         animeListView.setConverter(converter);
         animeListView.features().enableBounceEffect();
         animeListView.features().enableSmoothScrolling(0.5);

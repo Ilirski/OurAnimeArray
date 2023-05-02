@@ -1,12 +1,9 @@
 package com.animearray.ouranimearray.rightsidebar;
 
-import com.animearray.ouranimearray.widgets.DAOs.Score;
-import com.animearray.ouranimearray.widgets.DAOs.WatchStatus;
+import com.animearray.ouranimearray.widgets.DAOs.*;
+import com.animearray.ouranimearray.widgets.GenreTagsField;
 import com.tobiasdiez.easybind.EasyBind;
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXComboBox;
-import io.github.palexdev.materialfx.controls.MFXScrollPane;
-import io.github.palexdev.materialfx.controls.MFXSpinner;
+import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.models.spinner.IntegerSpinnerModel;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
@@ -22,7 +19,9 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import org.tbee.javafx.scene.layout.MigPane;
 
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.animearray.ouranimearray.widgets.Widgets.createAnimePoster;
 
@@ -32,27 +31,45 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
     private final Consumer<Runnable> setEpisodeWatched;
     private final Consumer<Runnable> getUserAnimeData;
     private final Consumer<Runnable> setUserScore;
+    private final Consumer<Runnable> getGenres;
 
     public RightSidebarPageViewBuilder(RightSidebarPageModel model, Consumer<Runnable> setAnimeStatus,
                                        Consumer<Runnable> setEpisodeWatched, Consumer<Runnable> getUserAnimeData,
-                                       Consumer<Runnable> setUserScore) {
+                                       Consumer<Runnable> setUserScore, Consumer<Runnable> getGenres) {
         this.model = model;
         this.setAnimeStatus = setAnimeStatus;
         this.setEpisodeWatched = setEpisodeWatched;
         this.getUserAnimeData = getUserAnimeData;
         this.setUserScore = setUserScore;
+        this.getGenres = getGenres;
     }
 
     @Override
     public Region build() {
+        MigPane rightSidebarOuter = new MigPane(
+                new LC().insets("0").fill()
+        );
+
+        // Add to outer pane
+        rightSidebarOuter.add(createUserRightSidebar(), new CC().grow().push().hideMode(3));
+        rightSidebarOuter.add(createAdminRightSidebar(), new CC().grow().push().hideMode(3));
+
+        // Bind visibility
+        rightSidebarOuter.visibleProperty().bindBidirectional(model.rightSidebarVisibleProperty());
+        rightSidebarOuter.getStyleClass().add("right-sidebar");
+
+        return rightSidebarOuter;
+    }
+
+    private Region createUserRightSidebar() {
         MigPane rightSideBar = new MigPane(
-                new LC().insets("10").fillX(),
+                new LC().insets("10"),
                 new AC().align("center")
         );
 
-        var scrollPane = new MFXScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setContent(rightSideBar);
+        var userScrollPane = new MFXScrollPane();
+        userScrollPane.setFitToWidth(true);
+        userScrollPane.setContent(rightSideBar);
 
         double targetWidth = 225;
         double targetHeight = 350;
@@ -120,16 +137,21 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         animeSynopsis.setWrapText(true);
 
         // Exit button
-        MFXButton button = new MFXButton("Exit");
-        button.setOnAction(event -> {
-            model.setRightSideBarVisible(false);
+        MFXButton exitButton = new MFXButton("Exit");
+        exitButton.setOnAction(event -> {
+            model.setRightSidebarVisible(false);
             model.setAnime(null);
         });
 
-        // Bind visibility
-        scrollPane.visibleProperty().bindBidirectional(model.rightSideBarVisibleProperty());
+        MFXButton editButton = new MFXButton("Edit");
+        editButton.setOnAction(event -> {
+            model.setUserRightSidebarVisible(false);
+            model.setAdminRightSidebarVisible(true);
+        });
+        editButton.visibleProperty().bind(model.adminProperty()); // Only show if admin
+
         // Scroll to top when new anime is selected
-        model.animeProperty().addListener(observable -> scrollPane.setVvalue(0.0));
+        model.animeProperty().addListener(observable -> userScrollPane.setVvalue(0.0));
 
         rightSideBar.add(animePoster, new CC().wrap());
         rightSideBar.add(animeTitle, new CC().wrap());
@@ -140,12 +162,83 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         rightSideBar.add(episodesWatchedSpinner, new CC().wrap().hideMode(3));
         rightSideBar.add(scoreComboBox, new CC().wrap().hideMode(3));
         rightSideBar.add(animeSynopsis, new CC().wrap());
-        rightSideBar.add(button);
+        rightSideBar.add(exitButton, new CC().split(2));
+        rightSideBar.add(editButton, new CC().hideMode(3));
 
-        scrollPane.getStyleClass().add("right-sidebar");
+        // User sidebar always visible at start
+        userScrollPane.visibleProperty().bindBidirectional(model.userRightSidebarVisibleProperty());
 
-//        return rightSideBar;
-        return scrollPane;
+//        userScrollPane.getStyleClass().add("right-sidebar");
+        return userScrollPane;
+    }
+
+    private Region createAdminRightSidebar() {
+        MigPane adminRightSidebar = new MigPane(
+                new LC().insets("10"),
+                new AC().align("left").fill(),
+                new AC().grow().fill()
+        );
+
+        var adminScrollPane = new MFXScrollPane();
+        adminScrollPane.setFitToWidth(true);
+        adminScrollPane.setContent(adminRightSidebar);
+
+        var titleField = new MFXTextField();
+        titleField.setFloatingText("Title");
+        var imageURLField = new MFXTextField();
+        imageURLField.setFloatingText("Image URL");
+        var episodesField = new MFXTextField();
+        episodesField.setFloatingText("Episodes");
+        var scoreField = new MFXTextField();
+        scoreField.setFloatingText("Score");
+        var synopsisField = new MFXTextField();
+        synopsisField.setFloatingText("Synopsis");
+        var genresTagsField = new GenreTagsField();
+
+        model.adminRightSidebarVisibleProperty().addListener(observable -> {
+            getGenres.accept(() -> {
+                System.out.println(model.getGenres());
+            });
+            genresTagsField.setSuggestionProvider(request -> model.getGenres().stream()
+                    .filter(genre -> genre.genre().toLowerCase().contains(request.getUserText().toLowerCase()))
+                    .collect(Collectors.toList()));
+        });
+
+        var submitButton = new MFXButton("Submit");
+        submitButton.setOnAction(event -> {
+            var title = titleField.getText();
+            var imageURL = imageURLField.getText();
+            var episodes = episodesField.getText();
+            var score = scoreField.getText();
+            List<Genre> genres = genresTagsField.getTags();
+            var synopsis = synopsisField.getText();
+            var anime = new AnimeDAO(null, title, imageURL, Integer.parseInt(episodes), Double.parseDouble(score), synopsis, genres);
+            model.setAnimeToCreateOrModify(anime);
+            System.out.println(
+                    model.getAnimeToCreateOrModify()
+            );
+        });
+
+        var viewButton = new MFXButton("View");
+        viewButton.setOnAction(event -> {
+            model.setUserRightSidebarVisible(true);
+            model.setAdminRightSidebarVisible(false);
+        });
+
+        // Scroll to top when new anime is selected
+        model.animeProperty().addListener(observable -> adminScrollPane.setVvalue(0.0));
+
+        adminRightSidebar.add(titleField, new CC().wrap());
+        adminRightSidebar.add(imageURLField, new CC().wrap());
+        adminRightSidebar.add(episodesField, new CC().wrap());
+        adminRightSidebar.add(scoreField, new CC().wrap());
+        adminRightSidebar.add(genresTagsField, new CC().wrap());
+        adminRightSidebar.add(synopsisField, new CC().wrap());
+        adminRightSidebar.add(submitButton, new CC().split(2));
+        adminRightSidebar.add(viewButton);
+
+        adminScrollPane.visibleProperty().bindBidirectional(model.adminRightSidebarVisibleProperty());
+        return adminScrollPane;
     }
 
     private MFXSpinner<Integer> createEpisodesWatchedSpinner() {
@@ -265,3 +358,4 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         return statusComboBox;
     }
 }
+

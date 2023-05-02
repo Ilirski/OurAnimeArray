@@ -14,13 +14,15 @@ import javafx.scene.Cursor;
 import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 
+import java.util.function.Consumer;
+
 // This class is used to render the cells of the list view
 public class AnimeListCell extends MFXListCell<AnimeList> {
     private final MFXFontIcon userIcon;
 
     public AnimeListCell(MFXListView<AnimeList> listView, AnimeList data, ObjectProperty<AnimeList> animeListToAddTo,
                          ObjectProperty<Anime> animeToBeAdded, BooleanProperty listPageSelected,
-                         StringProperty listId) {
+                         StringProperty listId, Consumer<Runnable> addAnimeToList, Consumer<Runnable> fetchAnimeList) {
         super(listView, data);
 
         // IMPORTANT AS NODES OF SUBCLASS REGIONS DO NOT GET CALCULATED
@@ -34,19 +36,28 @@ public class AnimeListCell extends MFXListCell<AnimeList> {
             Anime anime = ((AnimeGridCell) source).getItem();
             animeToBeAdded.set(anime);
             animeListToAddTo.set(data);
-            System.out.println(anime);
         });
 
         setOnMouseDragEntered(event -> {
             getScene().setCursor(Cursor.OPEN_HAND);
-            this.setBackground(Background.fill(Paint.valueOf("#f5f5f5")));
+            this.setStyle("-fx-background-color: #2966e1; -fx-border-color: #c0bdbd;");
             new Wobble(this).play();
         });
 
+        setOnMouseDragExited(event -> {
+            this.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        });
+
+//        setOnMouseEntered(event -> {
+//            listId.set(data.id());
+//        });
+
         setOnMouseClicked(event -> {
-            System.out.println("Setting list id to " + data.id());
+//            System.out.println("Setting list id to " + data.id());
             listId.set(data.id());
+//            fetchAnimeList.accept(() -> System.out.println("Anime List Fetched"));
             listPageSelected.set(true);
+//            System.out.println("Current list id: " + listId.get());
         });
 
         userIcon = new MFXFontIcon(FontResources.FOLDER.getDescription(), 18);

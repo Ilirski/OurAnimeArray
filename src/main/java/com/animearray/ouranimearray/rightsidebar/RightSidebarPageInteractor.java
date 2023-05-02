@@ -1,12 +1,16 @@
 package com.animearray.ouranimearray.rightsidebar;
 
 import com.animearray.ouranimearray.model.DatabaseFetcher;
+import com.animearray.ouranimearray.widgets.DAOs.Genre;
 import com.animearray.ouranimearray.widgets.DAOs.UserAnime;
+
+import java.util.List;
 
 public class RightSidebarPageInteractor {
     private final RightSidebarPageModel viewModel;
     private final DatabaseFetcher databaseFetcher;
     private UserAnime userAnimeData;
+    private List<Genre> genres;
 
     public RightSidebarPageInteractor(RightSidebarPageModel viewModel) {
         this.viewModel = viewModel;
@@ -48,6 +52,15 @@ public class RightSidebarPageInteractor {
     public void updateUserAnimeScore() {
         System.out.println(viewModel.getUserScore());
         viewModel.setUserScore(viewModel.getUserScore());
+    }
+
+    public void getGenres() {
+        genres = databaseFetcher.getGenres();
+    }
+
+    public void updateGenres() {
+        viewModel.genresProperty().clear();
+        viewModel.genresProperty().addAll(genres);
     }
 
     public void createLoggedInBinding() {

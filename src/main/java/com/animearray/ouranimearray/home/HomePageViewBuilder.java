@@ -3,7 +3,11 @@ package com.animearray.ouranimearray.home;
 import animatefx.animation.SlideInUp;
 import com.animearray.ouranimearray.widgets.DAOs.User;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.font.FontResources;
+import io.github.palexdev.materialfx.font.MFXFontIcon;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.When;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
@@ -22,10 +26,9 @@ public class HomePageViewBuilder implements Builder<Region> {
     private final Region rightSideBar;
     private final Region leftSideBar;
     private final Region listPage;
-    private final Region animeDatabasePage;
 
     public HomePageViewBuilder(HomePageModel model, Region searchPage, Region loginRegisterPage, Region profilePage,
-                               Region rightSideBar, Region leftSideBar, Region listPage, Region animeDatabasePage) {
+                               Region rightSideBar, Region leftSideBar, Region listPage) {
         this.model = model;
         this.searchPage = searchPage;
         this.loginRegisterPage = loginRegisterPage;
@@ -33,7 +36,6 @@ public class HomePageViewBuilder implements Builder<Region> {
         this.rightSideBar = rightSideBar;
         this.leftSideBar = leftSideBar;
         this.listPage = listPage;
-        this.animeDatabasePage = animeDatabasePage;
     }
 
     @Override
@@ -45,7 +47,6 @@ public class HomePageViewBuilder implements Builder<Region> {
         EasyBind.subscribe(profilePage.visibleProperty(), e -> new SlideInUp(profilePage).play());
         EasyBind.subscribe(loginRegisterPage.visibleProperty(), e -> new SlideInUp(loginRegisterPage).play());
         EasyBind.subscribe(listPage.visibleProperty(), e -> new SlideInUp(listPage).play());
-        EasyBind.subscribe(animeDatabasePage.visibleProperty(), e -> new SlideInUp(animeDatabasePage).play());
 
         // Side bars
         homePane.add(createNavigationBar(), new CC().dockNorth());
@@ -57,7 +58,6 @@ public class HomePageViewBuilder implements Builder<Region> {
         homePane.add(loginRegisterPage, new CC().grow().minWidth("30mm").hideMode(3));
         homePane.add(profilePage, new CC().grow().minWidth("30mm").hideMode(3));
         homePane.add(listPage, new CC().grow().minWidth("30mm").hideMode(3));
-        homePane.add(animeDatabasePage, new CC().grow().minWidth("30mm").hideMode(3));
         homePane.getStyleClass().add("home-page"); // Important for CSS and drag and drop functionality - Do not remove
         return homePane;
     }
@@ -70,12 +70,17 @@ public class HomePageViewBuilder implements Builder<Region> {
         var searchToggle = createNavToggle(FontResources.MAGNIFYING_GLASS, "Search");
         var loginRegisterToggle = createNavToggle(FontResources.USER, "Login / Register");
         var profileToggle = createNavToggle(FontResources.USER, "Profile");
-        var animeDatabaseToggle = createNavToggle(FontResources.FILES, "Anime Database");
 
         // Bind text of profileToggle to username of currentUser
         profileToggle.textProperty().bind(EasyBind.wrapNullable(model.currentUserProperty()).map(User::username).orElse("Profile"));
 
-        toggleGroup.getToggles().addAll(searchToggle, loginRegisterToggle, profileToggle, animeDatabaseToggle); // Add all toggles to toggleGroup
+        // If admin is logged in, change text and icon of searchToggle
+        searchToggle.textProperty().bind(Bindings.when(model.adminProperty()).then("Anime Database").otherwise("Search"));
+        searchToggle.labelLeadingIconProperty().bind(Bindings.when(model.adminProperty())
+                .then(new MFXIconWrapper(FontResources.FILES.getDescription(), 24, 32))
+                .otherwise(new MFXIconWrapper(FontResources.MAGNIFYING_GLASS.getDescription(), 24, 32)));
+
+        toggleGroup.getToggles().addAll(searchToggle, loginRegisterToggle, profileToggle); // Add all toggles to toggleGroup
         toggleGroup.selectToggle(searchToggle); // Select searchToggle by default
 
         // Ensure one toggle is always selected
@@ -134,21 +139,13 @@ public class HomePageViewBuilder implements Builder<Region> {
         // List page
         listPage.visibleProperty().bind(model.listPageSelectedProperty());
 
-        // Anime database page
-        model.animeDatabasePageSelectedProperty().bind(animeDatabaseToggle.selectedProperty());
-        animeDatabasePage.visibleProperty().bind(model.animeDatabasePageSelectedProperty());
-
         // Set toggle button visibility based on logged in or not
         loginRegisterToggle.visibleProperty().bind(model.loggedInProperty().not());
         profileToggle.visibleProperty().bind(model.loggedInProperty());
         myListsToggle.visibleProperty().bind(EasyBind.combine(model.loggedInProperty(), model.adminProperty(), (loggedIn, admin) -> loggedIn && !admin));
 
-        // Set toggle button visibility based on admin or not
-        animeDatabaseToggle.visibleProperty().bind(model.adminProperty());
-
         // Add toggles to navbar
         topSideBar.add(myListsToggle, new CC().grow().sizeGroup("toggle").alignX("left"));
-        topSideBar.add(animeDatabaseToggle, new CC().grow().sizeGroup("toggle").alignX("right").hideMode(3));
         topSideBar.add(searchToggle, new CC().grow().sizeGroup("toggle").alignX("right"));
         topSideBar.add(loginRegisterToggle, new CC().grow().sizeGroup("toggle").alignX("right").hideMode(3));
         topSideBar.add(profileToggle, new CC().grow().sizeGroup("toggle").alignX("right").hideMode(3));

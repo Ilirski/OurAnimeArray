@@ -5,6 +5,7 @@ module com.animearray.ouranimearray {
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
+    requires com.dlsc.gemsfx;
     requires net.synedra.validatorfx;
     requires com.miglayout.javafx;
     requires com.miglayout.core;

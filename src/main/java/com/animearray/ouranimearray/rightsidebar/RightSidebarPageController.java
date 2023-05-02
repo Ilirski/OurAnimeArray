@@ -13,17 +13,19 @@ public class RightSidebarPageController implements ControllerFX {
     private final RightSidebarPageInteractor interactor;
     private final Builder<Region> viewBuilder;
 
-    public RightSidebarPageController(AnimeProperty animeProperty, ObjectProperty<User> currentUserProperty, BooleanProperty rightSideBarVisibleProperty) {
+    public RightSidebarPageController(AnimeProperty animeProperty, ObjectProperty<User> currentUserProperty,
+                                      BooleanProperty adminProperty, BooleanProperty rightSideBarVisibleProperty) {
         var model = new RightSidebarPageModel();
         interactor = new RightSidebarPageInteractor(model);
         viewBuilder = new RightSidebarPageViewBuilder(model, this::setAnimeStatus,
                 this::setEpisodeWatched, this::getUserAnimeData,
-                this::setUserScore);
+                this::setUserScore, this::getGenres);
 
         // Share model with other controllers
         model.currentUserProperty().bind(currentUserProperty);
+        model.adminProperty().bind(adminProperty);
         model.animeProperty().bindBidirectional(animeProperty);
-        model.rightSideBarVisibleProperty().bindBidirectional(rightSideBarVisibleProperty);
+        model.rightSidebarVisibleProperty().bindBidirectional(rightSideBarVisibleProperty);
     }
 
     private void getUserAnimeData(Runnable postUserAnimeDataGet) {
@@ -85,6 +87,22 @@ public class RightSidebarPageController implements ControllerFX {
         fetchTask.setOnSucceeded(event -> {
             interactor.updateUserAnimeScore();
             postUserScoreSet.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
+    public void getGenres(Runnable postGenresGet) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.getGenres();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            interactor.updateGenres();
+            postGenresGet.run();
         });
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();

@@ -136,7 +136,7 @@ public class Widgets {
         MFXTextField searchBar = new MFXTextField();
         searchBar.setFloatMode(FloatMode.BORDER);
         searchBar.setFloatingText("Search");
-        searchBar.setTrailingIcon(new MFXFontIcon("mfx-magnifying-glass", 12));
+        searchBar.setLeadingIcon(new MFXFontIcon("mfx-magnifying-glass", 18));
         searchBar.textProperty().bindBidirectional(searchQueryProperty);
         searchBar.setOnAction(event -> {
             searchBar.setDisable(true);

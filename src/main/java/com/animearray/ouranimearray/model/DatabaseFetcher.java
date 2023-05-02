@@ -447,4 +447,55 @@ public class DatabaseFetcher {
 
         return;
     }
+
+    public List<Genre> getGenres() {
+        String sql = """
+                SELECT *
+                FROM genre
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            System.out.println("Executing query...");
+
+            List<Genre> genres = new ArrayList<>();
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String name = rs.getString("genre");
+
+                genres.add(new Genre(id, name));
+            }
+
+            return genres;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        throw new RuntimeException("Problem with SQL fetching");
+
+    }
+
+    public void removeAnimeFromList(String animeId, String listId) {
+        String sql = """
+                DELETE FROM list_anime
+                WHERE list_id = ? AND anime_id = ?
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, listId);
+            ps.setString(2, animeId);
+
+
+            System.out.println("Trying to remove anime from list");
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return;
+    }
 }
