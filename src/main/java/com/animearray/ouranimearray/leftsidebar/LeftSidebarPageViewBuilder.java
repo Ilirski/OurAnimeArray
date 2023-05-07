@@ -8,6 +8,7 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.effects.DepthLevel;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.utils.others.FunctionalStringConverter;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
@@ -20,14 +21,18 @@ import java.util.function.Consumer;
 
 public class LeftSidebarPageViewBuilder implements Builder<Region> {
     private final LeftSidebarPageModel model;
-    private final Consumer<Runnable> fetchAnimeList;
+    private final Consumer<Runnable> fetchUserAnimeLists;
     private final Consumer<Runnable> addAnimeToList;
     private final Consumer<Runnable> createNewAnimeList;
-    public LeftSidebarPageViewBuilder(LeftSidebarPageModel model, Consumer<Runnable> fetchAnimeList, Consumer<Runnable> addAnimeToList, Consumer<Runnable> createNewAnimeList) {
+    private final Consumer<Runnable> deleteAnimeList;
+    public LeftSidebarPageViewBuilder(LeftSidebarPageModel model, Consumer<Runnable> fetchUserAnimeLists,
+                                      Consumer<Runnable> addAnimeToList, Consumer<Runnable> createNewAnimeList,
+                                      Consumer<Runnable> deleteAnimeList) {
         this.model = model;
-        this.fetchAnimeList = fetchAnimeList;
+        this.fetchUserAnimeLists = fetchUserAnimeLists;
         this.addAnimeToList = addAnimeToList;
         this.createNewAnimeList = createNewAnimeList;
+        this.deleteAnimeList = deleteAnimeList;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
         // When leftSideBarVisibleProperty is visible, refresh user's the anime list
         model.leftSideBarVisibleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                fetchAnimeList.accept(() -> System.out.println("Anime List Fetched"));
+                fetchUserAnimeLists.accept(() -> System.out.println("Anime List Fetched"));
             }
         });
 
@@ -62,22 +67,20 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
         addNewAnimeListField.setPromptText("Add New List");
         addNewAnimeListField.setFloatMode(FloatMode.BORDER);
         addNewAnimeListField.textProperty().bindBidirectional(model.animeListNameToCreateProperty());
-        addNewAnimeListField.setOnAction(event -> {
-            model.setNotification("");
-        });
+        addNewAnimeListField.setOnAction(event -> model.setNotification(""));
+
 
         var notificationLabel = new Label();
         notificationLabel.textProperty().bindBidirectional(model.notificationProperty());
         notificationLabel.visibleProperty().bind(model.notificationProperty().isNotEmpty());
+        notificationLabel.setAlignment(Pos.CENTER);
 
         var addNewListButton = new MFXButton("Add");
         addNewListButton.disableProperty().bind(model.animeListNameToCreateProperty().length().lessThan(5));
-        addNewListButton.setOnAction(event -> {
-            createNewAnimeList.accept(() -> fetchAnimeList.accept(() -> System.out.println("Anime List Fetched")));
-        });
+        addNewListButton.setOnAction(event -> createNewAnimeList.accept(() -> fetchUserAnimeLists.accept(() -> model.setAnimeListNameToCreate(""))));
 
         addNewListPane.add(addNewAnimeListField, new CC().grow().wrap());
-        addNewListPane.add(notificationLabel, new CC().grow().wrap().hideMode(3));
+        addNewListPane.add(notificationLabel, new CC().grow().wrap().alignX("center").hideMode(3));
         addNewListPane.add(addNewListButton, new CC().grow().height("10%"));
 
         return addNewListPane;
@@ -95,12 +98,11 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
     }
 
     public MFXListView<AnimeList> createAnimeListView() {
-
         // Creating the Anime List View
         MFXListView<AnimeList> animeListView = new MFXListView<>(model.animeWatchListProperty());
         StringConverter<AnimeList> converter = FunctionalStringConverter.to(animeList -> (animeList == null) ? "" : animeList.name());
         animeListView.setCellFactory(animeList -> new AnimeListCell(animeListView, animeList, model.animeListToAddToProperty(),
-                model.animeToAddProperty(), model.listPageSelectedProperty(), model.listIdProperty(), addAnimeToList, fetchAnimeList));
+                model.animeToAddProperty(), model.listPageSelectedProperty(), model.listIdProperty(), model.listIdToDeleteProperty(), deleteAnimeList, fetchUserAnimeLists));
         animeListView.setConverter(converter);
         animeListView.features().enableBounceEffect();
         animeListView.features().enableSmoothScrolling(0.5);

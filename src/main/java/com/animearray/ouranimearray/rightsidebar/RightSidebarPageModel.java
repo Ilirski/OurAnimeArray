@@ -19,8 +19,34 @@ public class RightSidebarPageModel {
     private final BooleanProperty watchStatusNotSet = new SimpleBooleanProperty(true);
     private final UserAnimeProperty userAnimeData = new UserAnimeProperty();
     private final IntegerProperty userScore = new SimpleIntegerProperty(0);
-    private final ObjectProperty<AnimeDAO> animeToCreateOrModify = new SimpleObjectProperty<>();
+    private final ObjectProperty<AnimeToSave> animeToCreateOrModify = new SimpleObjectProperty<>();
     private final ListProperty<Genre> genres = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty savingAnime = new SimpleBooleanProperty(false);
+    private final BooleanProperty editing = new SimpleBooleanProperty(false);
+
+    public boolean isEditing() {
+        return editing.get();
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing.set(editing);
+    }
+
+    public BooleanProperty editingProperty() {
+        return editing;
+    }
+
+    public boolean isSavingAnime() {
+        return savingAnime.get();
+    }
+
+    public void setSavingAnime(boolean savingAnime) {
+        this.savingAnime.set(savingAnime);
+    }
+
+    public BooleanProperty savingAnimeProperty() {
+        return savingAnime;
+    }
 
     public boolean isAdmin() {
         return admin.get();
@@ -66,15 +92,15 @@ public class RightSidebarPageModel {
         return genres;
     }
 
-    public AnimeDAO getAnimeToCreateOrModify() {
+    public AnimeToSave getAnimeToCreateOrModify() {
         return animeToCreateOrModify.get();
     }
 
-    public void setAnimeToCreateOrModify(AnimeDAO animeToCreateOrModify) {
+    public void setAnimeToCreateOrModify(AnimeToSave animeToCreateOrModify) {
         this.animeToCreateOrModify.set(animeToCreateOrModify);
     }
 
-    public ObjectProperty<AnimeDAO> animeToCreateOrModifyProperty() {
+    public ObjectProperty<AnimeToSave> animeToCreateOrModifyProperty() {
         return animeToCreateOrModify;
     }
 

@@ -1,0 +1,184 @@
+.home-page {
+    -fx-background-color: #1d1d1d;
+}
+
+.home-page .label {
+    -fx-text-fill: white;
+}
+
+.home-page .animeGridCell {
+    -fx-background-color: black;
+    -fx-border-color: black ;
+    -fx-border-width: 2;
+}
+
+.home-page .animeGridCell > .label {
+    -fx-text-fill:white;
+}
+
+.home-page .animeGridCell:hover {
+    -fx-background-color: #dae7f3;
+    -fx-border-color: #d2dfea;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.home-page .animeGridCell:hover > .label{
+    -fx-text-fill: black;
+}
+
+.home-page .mfx-button {
+    -fx-background-color: #2967e3;
+    -fx-text-fill: white;
+}
+
+.home-page .mfx-text-field {
+    -mfx-main: #2966e1;
+    -fx-background-color: #3f3f3f;
+    -fx-border-color: #313030;
+    -fx-text-fill: white;
+}
+
+.home-page .mfx-text-field .floating-text {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cccccc;
+}
+
+.home-page .mfx-text-field:focus-within {
+    -fx-background-insets: 2;
+    -fx-border-color: #2966e1;
+    -fx-border-width: 1.5;
+    -fx-border-insets: -0.5;
+}
+
+.home-page .mfx-password-field .mfx-icon-wrapper .mfx-font-icon {
+    -mfx-color: #cccccc;
+}
+
+.home-page .hyperlink:visited {
+    -fx-text-fill: #1a788d;
+}
+
+.validatedField:invalid {
+    -fx-border-color: -mfx-red;
+}
+
+.validatedField:invalid .floating-text {
+    -fx-text-fill: -mfx-red;
+}
+
+.validatedField:invalid .mfx-font-icon {
+    -mfx-color: -mfx-red;
+}
+
+.validationLabel {
+    -fx-font-family: 'Visby Round CF Demi Bold';
+    -fx-font-size: 11;
+}
+
+/* Styling taken from https://stackoverflow.com/a/48050208/17771525 */
+
+.home-page .scroll-bar:horizontal,
+.home-page .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 12;
+    -fx-pref-height: 12;
+    -fx-padding: 5 0.5 5 0.5;
+}
+
+.home-page .scroll-bar:horizontal .track,
+.home-page .scroll-bar:vertical .track{
+    -fx-background-color: #111111;
+    -fx-background-radius: 2.0em;
+    -fx-border-radius: 2.0em;
+    -fx-border-color: transparent;
+    -fx-background-insets: 3;
+}
+
+.home-page .right-sidebar .scroll-bar:horizontal .track,
+.home-page .right-sidebar .scroll-bar:vertical .track{
+    -fx-background-color: #1d1d1d;
+    -fx-background-radius: 0.0em;
+    -fx-border-radius: 2.0em;
+}
+
+.home-page .scroll-bar:horizontal .increment-button ,
+.home-page .scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 0.0 10.0 0.0;
+}
+
+.home-page .scroll-bar:vertical .increment-button ,
+.home-page .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0.0em;
+    -fx-padding :0.0 10.0 0.0 0.0;
+
+}
+
+.home-page .scroll-bar .increment-arrow,
+.home-page .scroll-bar .decrement-arrow{
+    -fx-shape : " ";
+    -fx-padding :0.15em 0.0;
+}
+
+.home-page .scroll-bar:vertical .increment-arrow,
+.home-page .scroll-bar:vertical .decrement-arrow{
+    -fx-shape : " ";
+    -fx-padding :0.0 0.15em;
+}
+
+.home-page .scroll-bar:horizontal .thumb,
+.home-page .scroll-bar:vertical .thumb {
+    -fx-background-color :derive(#e8e7e7,90.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.home-page .scroll-bar:horizontal .thumb:hover,
+.home-page .scroll-bar:vertical .thumb:hover {
+    -fx-background-color :derive(#e8e7e7,10.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.home-page #search-bar {
+    /* make rounded */
+    -fx-background-radius: 20;
+    /*-fx-background-color: #1d1d1d;*/
+    -fx-border-radius: 20;
+    /*-fx-border-color: #1d1d1d;*/
+    -fx-border-width: 1;
+}
+
+.home-page #search-bar .mfx-font-icon {
+    -mfx-color: #cccccc;
+}
+
+.mfx-combo-box {
+    -fx-background-color: #3f3f3f;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: white;
+}
+
+.mfx-combo-box .floating-text {
+    -fx-text-fill: white;
+}
+
+.mfx-combo-box .caret .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.mfx-combo-box-cell:hover {
+    -fx-background-color: rgba(169, 169, 169, 0.32);
+}
+
+.mfx-combo-box-cell:selected {
+    -fx-background-color: rgba(29, 29, 29, 0.46);
+}
+
+.mfx-combo-box .combo-popup .virtual-flow {
+    -fx-background-color: #3f3f3f;
+    -fx-border-color: #313030;
+}

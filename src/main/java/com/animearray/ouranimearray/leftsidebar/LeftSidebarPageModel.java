@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class LeftSidebarPageModel {
-    private final ListProperty<AnimeList> animeList = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<AnimeList> userAnimeLists = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty leftSideBarVisible = new SimpleBooleanProperty(false);
     private final ObjectProperty<Anime> animeToAdd = new SimpleObjectProperty<>();
     private final ObjectProperty<AnimeList> animeListToAddTo = new SimpleObjectProperty<>();
@@ -16,8 +16,21 @@ public class LeftSidebarPageModel {
     private final BooleanProperty loggedIn = new SimpleBooleanProperty(false);
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
     private final StringProperty listId = new SimpleStringProperty();
+    private final StringProperty listIdToDelete = new SimpleStringProperty();
     private final StringProperty animeListNameToCreate = new SimpleStringProperty();
     private final StringProperty notification = new SimpleStringProperty();
+
+    public String getListIdToDelete() {
+        return listIdToDelete.get();
+    }
+
+    public void setListIdToDelete(String listIdToDelete) {
+        this.listIdToDelete.set(listIdToDelete);
+    }
+
+    public StringProperty listIdToDeleteProperty() {
+        return listIdToDelete;
+    }
 
     public String getNotification() {
         return notification.get();
@@ -115,16 +128,16 @@ public class LeftSidebarPageModel {
         return loggedIn;
     }
 
-    public ObservableList<AnimeList> getAnimeList() {
-        return animeList.get();
+    public ObservableList<AnimeList> getUserAnimeLists() {
+        return userAnimeLists.get();
     }
 
-    public void setAnimeList(ObservableList<AnimeList> animeList) {
-        this.animeList.set(animeList);
+    public void setUserAnimeLists(ObservableList<AnimeList> userAnimeLists) {
+        this.userAnimeLists.set(userAnimeLists);
     }
 
     public ListProperty<AnimeList> animeWatchListProperty() {
-        return animeList;
+        return userAnimeLists;
     }
 
     public boolean isLeftSideBarVisible() {

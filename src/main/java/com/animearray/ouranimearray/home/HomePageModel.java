@@ -14,24 +14,19 @@ public class HomePageModel {
     private final BooleanProperty searchPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty loginRegisterPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty profilePageSelected = new SimpleBooleanProperty(false);
-    private final BooleanProperty myListsPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
-    private final BooleanProperty animeDatabasePageSelected = new SimpleBooleanProperty(false);
     private final StringProperty listId = new SimpleStringProperty();
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanBinding loggedIn = EasyBind.wrapNullable(currentUser).isPresent();
     private final BooleanProperty admin = new SimpleBooleanProperty(false);
+    private final BooleanProperty editing = new SimpleBooleanProperty(false);
 
-    public boolean getAnimeDatabasePageSelected() {
-        return animeDatabasePageSelected.get();
+    public boolean isEditing() {
+        return editing.get();
     }
 
-    public void setAnimeDatabasePageSelected(boolean animeDatabasePageSelected) {
-        this.animeDatabasePageSelected.set(animeDatabasePageSelected);
-    }
-
-    public BooleanProperty animeDatabasePageSelectedProperty() {
-        return animeDatabasePageSelected;
+    public BooleanProperty editingProperty() {
+        return editing;
     }
 
     public String getListId() {
@@ -44,14 +39,6 @@ public class HomePageModel {
 
     public StringProperty listIdProperty() {
         return listId;
-    }
-
-    public boolean isMyListsPageSelected() {
-        return myListsPageSelected.get();
-    }
-
-    public BooleanProperty myListsPageSelectedProperty() {
-        return myListsPageSelected;
     }
 
     public boolean isListPageSelected() {

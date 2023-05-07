@@ -1,6 +1,7 @@
 package com.animearray.ouranimearray.widgets;
 
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
+import com.animearray.ouranimearray.widgets.DAOs.Genre;
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Binding;
 import javafx.beans.property.ObjectPropertyBase;
@@ -17,7 +18,7 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
     private final Binding<Integer> episodes;
     private final Binding<Double> score;
     private final Binding<String> synopsis;
-    private final Binding<List<String>> genres;
+    private final Binding<List<Genre>> genres;
 
     public AnimeProperty(Anime anime) {
         set(anime);
@@ -29,7 +30,7 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
         this.episodes = EasyBind.wrapNullable(this).map(Anime::episodes).orElse(0);
         this.score = EasyBind.wrapNullable(this).map(Anime::score).orElse(0.0);
         this.synopsis = EasyBind.wrapNullable(this).map(Anime::synopsis).orElse("Synopsis Not Found");
-        this.genres = EasyBind.wrapNullable(this).map(Anime::genres).orElse(Collections.singletonList("Genres Not Found"));
+        this.genres = EasyBind.wrapNullable(this).map(Anime::genres).orElse(Collections.singletonList(new Genre(null, null)));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
         return synopsis;
     }
 
-    public Binding<List<String>> genresBinding() {
+    public Binding<List<Genre>> genresBinding() {
         return genres;
     }
 

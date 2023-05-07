@@ -35,9 +35,4 @@ public class LoginRegisterPageInteractor {
         viewModel.setCurrentUser(currentUser);
     }
 
-
-    public void getUsers() {
-        List<User> users = databaseFetcher.getUsers();
-        System.out.println(users);
-    }
 }

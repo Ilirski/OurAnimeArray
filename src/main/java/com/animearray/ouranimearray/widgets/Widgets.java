@@ -1,6 +1,5 @@
 package com.animearray.ouranimearray.widgets;
 
-import animatefx.animation.Wobble;
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
@@ -17,7 +16,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -149,25 +147,6 @@ public class Widgets {
         searchBar.setId("search-bar");
 
         return searchBar;
-    }
-    public static MFXRectangleToggleNode createListToggle(String text) {
-        // icon.getDescription() returns the proper string of the icon
-        var wrapper = new MFXIconWrapper(FontResources.FOLDER.getDescription(), 24, 32);
-        var toggleNode = new MFXRectangleToggleNode(text, wrapper);
-        toggleNode.setAlignment(Pos.CENTER_LEFT);
-        toggleNode.setMaxWidth(Double.MAX_VALUE);
-
-        toggleNode.setOnMouseDragReleased(event -> {
-            var hi = (AnimeGridCell) event.getGestureSource();
-            System.out.println(hi.getItem());
-        });
-
-        toggleNode.setOnMouseDragEntered(event -> {
-            toggleNode.getScene().setCursor(Cursor.OPEN_HAND);
-            new Wobble(toggleNode).play();
-        });
-
-        return toggleNode;
     }
 
     public static MFXRectangleToggleNode createNavToggle(FontResources icon, String text) {

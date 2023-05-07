@@ -36,9 +36,7 @@ public class ProfilePageViewBuilder implements Builder<Region> {
 
         // Log out button
         var logoutButton = new MFXButton("Log Out");
-        logoutButton.setOnAction(e -> {
-            model.currentUserProperty().set(null);
-        });
+        logoutButton.setOnAction(e -> model.currentUserProperty().set(null));
 
         profilePane.add(label, new CC().grow());
         profilePane.add(usernameLabel, new CC().grow());

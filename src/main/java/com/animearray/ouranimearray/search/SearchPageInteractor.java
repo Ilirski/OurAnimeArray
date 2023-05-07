@@ -15,7 +15,7 @@ public class SearchPageInteractor {
     }
 
     public void searchAnime() {
-        animeListData = databaseFetcher.searchAnime(viewModel.getSearchQuery());
+        animeListData = databaseFetcher.searchAnime(viewModel.getSearchQuery(), viewModel.getSortType());
     }
 
     public void updateAnimeListFromSearch() {

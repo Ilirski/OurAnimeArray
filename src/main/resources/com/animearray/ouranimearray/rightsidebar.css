@@ -56,5 +56,38 @@
     -mfx-color: #2967e3;
 }
 
+.tags-field > .flow-pane > .tag-view {
+    -fx-background: -fx-accent;
+    -fx-background-color: #2967e3;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-cursor: default;
+    -fx-background-radius: 0.166667em;
+    -fx-padding: 0.166667em 0.666667em;
+}
+
+.tags-field > .flow-pane {
+    -fx-background-color: #3f3f3f;
+    -fx-border-color: #313030;
+}
+
+.tags-field > .flow-pane > .text-field {
+    -fx-text-fill: white;
+}
+
+.tags-field .graphic-wrapper .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+.expanding-text-area {
+    -fx-background-color: #3f3f3f;
+    -fx-border-color: #313030;
+    -fx-border-radius: 3;
+    -fx-text-fill: white;
+}
+
+.content {
+    -fx-background-color: #3f3f3f;
+}
+
 
 

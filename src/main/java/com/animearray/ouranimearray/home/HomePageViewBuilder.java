@@ -5,9 +5,7 @@ import com.animearray.ouranimearray.widgets.DAOs.User;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.controls.MFXIconWrapper;
 import io.github.palexdev.materialfx.font.FontResources;
-import io.github.palexdev.materialfx.font.MFXFontIcon;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.When;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
@@ -51,7 +49,7 @@ public class HomePageViewBuilder implements Builder<Region> {
         // Side bars
         homePane.add(createNavigationBar(), new CC().dockNorth());
         homePane.add(leftSideBar, new CC().dockWest().width("15%").hideMode(3));
-        homePane.add(rightSideBar, new CC().dockEast().width("20%").hideMode(3));
+        homePane.add(rightSideBar, new CC().dockEast().width("25%").hideMode(3));
 
         // Home page
         homePane.add(searchPage, new CC().grow().minWidth("30mm").hideMode(3));
@@ -133,7 +131,7 @@ public class HomePageViewBuilder implements Builder<Region> {
         profilePage.visibleProperty().bind(model.profilePageSelectedProperty());
 
         // Left sidebar
-        model.leftSideBarVisibleProperty().bind(myListsToggle.selectedProperty());
+        model.leftSideBarVisibleProperty().bind(EasyBind.combine(myListsToggle.visibleProperty(), myListsToggle.selectedProperty(), (visible, selected) -> visible && selected));
         leftSideBar.visibleProperty().bind(model.leftSideBarVisibleProperty());
 
         // List page

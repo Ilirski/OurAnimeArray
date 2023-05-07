@@ -16,6 +16,32 @@ public class ListPageModel {
     private final UserListProperty userList = new UserListProperty();
     private final StringProperty listId = new SimpleStringProperty("");
     private final StringProperty animeIdToRemove = new SimpleStringProperty("");
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
+    private final BooleanProperty editListInfo = new SimpleBooleanProperty(false);
+
+    public boolean isEditListInfo() {
+        return editListInfo.get();
+    }
+
+    public void setEditListInfo(boolean editListInfo) {
+        this.editListInfo.set(editListInfo);
+    }
+
+    public BooleanProperty editListInfoProperty() {
+        return editListInfo;
+    }
+
+    public boolean isLoading() {
+        return loading.get();
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading.set(loading);
+    }
+
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
 
     public String getAnimeIdToRemove() {
         return animeIdToRemove.get();

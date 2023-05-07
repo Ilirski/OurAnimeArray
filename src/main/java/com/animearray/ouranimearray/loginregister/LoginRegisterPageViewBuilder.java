@@ -116,9 +116,7 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         loginButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> {
-                isFetchingUser.set(false);
-            });
+            userFetcher.accept(() -> isFetchingUser.set(false));
         });
 
         return loginButton;

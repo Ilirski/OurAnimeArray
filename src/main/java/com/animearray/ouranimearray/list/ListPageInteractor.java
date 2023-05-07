@@ -18,7 +18,9 @@ public class ListPageInteractor {
     }
 
     public void getUserAnimeList() {
+        System.out.println("Before");
         animeListData = databaseFetcher.getAnimeFromList(viewModel.getListId());
+        System.out.println(animeListData);
     }
 
     public void updateAnimeList() {
@@ -36,5 +38,9 @@ public class ListPageInteractor {
 
     public void removeAnimeFromList() {
         databaseFetcher.removeAnimeFromList(viewModel.getAnimeIdToRemove(), viewModel.getListId());
+    }
+
+    public void editUserAnimeList() {
+        databaseFetcher.editUserAnimeList(viewModel.getListId(), viewModel.userListProperty().getListName(), viewModel.userListProperty().getDescription());
     }
 }

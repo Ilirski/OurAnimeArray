@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DatabaseFetcher {
     // Refer to https://github.com/220118-Pega/Quezon-Aldrick-Code/blob/f908d976c4d73cc98a94df137b323bc00730d2de/Zero/ProZero/src/zero/userdata/RequestDAO.java
@@ -24,7 +25,7 @@ public class DatabaseFetcher {
         String sql = "INSERT INTO user(username, password) VALUES (?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement ps = conn.prepareStatement(sql);) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ps.setString(2, password);
@@ -58,30 +59,6 @@ public class DatabaseFetcher {
             System.out.println(e.getMessage());
             return Optional.empty();
         }
-    }
-
-    public List<User> getUsers() {
-
-        List<User> users = new ArrayList<>();
-
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM user LIMIT 30")) {
-            while (rs.next()) {
-                String id = rs.getString("id");
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-                String accountType = rs.getString("account_type");
-
-                users.add(new User(id, username, password, AccountType.valueOf(accountType)));
-            }
-
-            return users;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        throw new RuntimeException("Problem with SQL fetching");
     }
 
     public List<AnimeList> getAnimeLists(String userId) {
@@ -120,50 +97,6 @@ public class DatabaseFetcher {
         throw new RuntimeException("Problem with SQL fetching");
     }
 
-    public Optional<WatchStatus> getAnimeWatchStatus(String animeId, String userId) {
-        String sql = """
-                SELECT status
-                FROM user_anime
-                WHERE user_id = ? AND anime_id = ?
-                """;
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, userId);
-            ps.setString(2, animeId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                var status = rs.getString("status");
-                // Map one letter status to WatchStatus Enum
-                switch (status) {
-                    case "W" -> {
-                        return Optional.of(WatchStatus.WATCHING);
-                    }
-                    case "C" -> {
-                        return Optional.of(WatchStatus.COMPLETED);
-                    }
-                    case "O" -> {
-                        return Optional.of(WatchStatus.ON_HOLD);
-                    }
-                    case "P" -> {
-                        return Optional.of(WatchStatus.PLAN_TO_WATCH);
-                    }
-                    case "D" -> {
-                        return Optional.of(WatchStatus.DROPPED);
-                    }
-                }
-            } else {
-                return Optional.empty();
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        throw new RuntimeException("Problem with SQL fetching");
-    }
-
     public void setAnimeWatchStatus(String animeId, String userId, String status) {
         String sql = """
                 INSERT INTO user_anime (user_id, anime_id, status)
@@ -181,30 +114,42 @@ public class DatabaseFetcher {
             ps.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return;
         }
 
         return;
     }
 
-    public List<Anime> searchAnime(String query) {
+    public List<Anime> searchAnime(String searchQuery, SortType sortType) {
         String sql = """
-                SELECT *, GROUP_CONCAT(genre.genre) AS genres
+                SELECT anime.*, GROUP_CONCAT(genre.id || ' ' || genre.genre) AS genres
                 FROM anime
-                JOIN anime_genre ON anime.id = anime_genre.anime_id AND anime.title LIKE ?
-                JOIN genre ON genre.id = anime_genre.genre_id
+                LEFT JOIN anime_genre ON anime.id = anime_genre.anime_id
+                LEFT JOIN genre ON genre.id = anime_genre.genre_id
+                WHERE anime.title LIKE ?
                 GROUP BY anime.id
-                ORDER BY score DESC
+                ORDER BY %s
                 LIMIT 50
                 """;
 
+        // Order by switch (https://stackoverflow.com/a/2857417/17771525)
+        String orderBy = switch (sortType) {
+            case POPULARITY -> "anime.members DESC";
+            case SCORE -> "anime.score DESC";
+            case TITLE -> "anime.title ASC";
+            case NEWEST -> "anime.created_at DESC";
+        };
+
+        sql = String.format(sql, orderBy);
+
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + query + "%"); // add wildcards for fuzzy search
 
+            ps.setString(1, "%" + searchQuery + "%"); // add wildcards for fuzzy search
             ResultSet rs = ps.executeQuery();
             System.out.println("Executing query...");
 
-            return getAnime(rs);
+            return makeAnime(rs);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -212,7 +157,7 @@ public class DatabaseFetcher {
         throw new RuntimeException("Problem with SQL fetching");
     }
 
-    private List<Anime> getAnime(ResultSet rs) throws SQLException {
+    private List<Anime> makeAnime(ResultSet rs) throws SQLException {
         List<CompletableFuture<Anime>> animeFutures = new ArrayList<>();
 
         while (rs.next()) {
@@ -224,8 +169,19 @@ public class DatabaseFetcher {
             String synopsis = rs.getString("synopsis");
             String genres = rs.getString("genres");
 
-            // Split genres into a list
-            List<String> gen = List.of(genres.split(","));
+            List<Genre> gen;
+
+            if (genres == null) {
+                gen = new ArrayList<>();
+            } else {
+                // Split genres into a list of genres
+                gen = Stream.of(genres.split(",")).map(s -> {
+                    String[] split = s.split(" ");
+                    String genreId = split[0];
+                    String genreName = split[1];
+                    return new Genre(genreId, genreName);
+                }).toList();
+            }
 
             // After 5 seconds, if the image has not been loaded, return a default image
             CompletableFuture<Anime> animeFuture = CompletableFuture.supplyAsync(() -> turnUrlToImage(imageUrl))
@@ -274,11 +230,17 @@ public class DatabaseFetcher {
     }
 
     public Image turnUrlToImage(String url) {
-        // If the url is empty, return a default image
-        if (url == null) {
+        try {
+            // If the url is empty, return a default image
+            if (url == null || url.isBlank()) {
+                return new Image(ERROR_IMAGE_URL);
+            }
+
+            // Check if the url is valid (https://stackoverflow.com/a/5719282/17771525)
+            return new Image(url);
+        } catch (IllegalArgumentException e) {
             return new Image(ERROR_IMAGE_URL);
         }
-        return new Image(url);
     }
 
     public void addAnimeToList(String animeToAddId, String animeListToAddToId) {
@@ -295,36 +257,10 @@ public class DatabaseFetcher {
             ps.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return;
         }
 
         return;
-    }
-
-    public int getEpisodeWatched(String animeId, String userId) {
-        String sql = """
-                SELECT watched_episodes
-                FROM user_anime
-                WHERE user_id = ? AND anime_id = ?
-                """;
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, userId);
-            ps.setString(2, animeId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                int episode = rs.getInt("watched_episodes");
-                return episode;
-            } else {
-                return 0;
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        throw new RuntimeException("Problem with SQL fetching");
     }
 
     public void setEpisodeWatched(String animeId, String userId, int episode) {
@@ -341,10 +277,10 @@ public class DatabaseFetcher {
             ps.setString(1, userId);
             ps.setString(2, animeId);
             ps.setInt(3, episode);
-            System.out.println(episode);
             ps.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return;
         }
 
         return;
@@ -374,7 +310,7 @@ public class DatabaseFetcher {
 
     public List<Anime> getAnimeFromList(String listId) {
         String sql = """
-                SELECT *, GROUP_CONCAT(genre.genre) AS genres
+                SELECT anime.*, GROUP_CONCAT(genre.id || ' ' || genre.genre) AS genres
                 FROM anime
                 JOIN list_anime ON anime.id = list_anime.anime_id AND list_anime.list_id = ?
                 JOIN anime_genre ON anime.id = anime_genre.anime_id
@@ -391,7 +327,7 @@ public class DatabaseFetcher {
             ResultSet rs = ps.executeQuery();
             System.out.println("Executing query...");
 
-            return getAnime(rs);
+            return makeAnime(rs);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -429,6 +365,24 @@ public class DatabaseFetcher {
         }
 
         throw new RuntimeException("Problem with SQL fetching");
+    }
+
+    public void deleteAnimeList(String listId) {
+        String sql = """
+                DELETE FROM list
+                WHERE id = ?
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, listId);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return;
     }
 
     public void createNewAnimeList(String userId, String name) throws SQLException {
@@ -489,11 +443,158 @@ public class DatabaseFetcher {
             ps.setString(1, listId);
             ps.setString(2, animeId);
 
-
-            System.out.println("Trying to remove anime from list");
             ps.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return;
+        }
+
+        return;
+    }
+
+    public void editUserAnimeList(String listId, String name, String description) {
+        String sql = """
+                UPDATE list
+                SET name = ?, description = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, description);
+            ps.setString(3, listId);
+
+            System.out.println(listId + " " + name + " " + description);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        return;
+    }
+
+    public void editAnime(AnimeToSave animeToEdit) {
+        String animeSql = """
+                UPDATE anime
+                SET title = ?, synopsis = ?, score = ?, link = ?, episodes = ?
+                WHERE id = ?
+                """;
+
+        String deleteGenresSQL = """
+                DELETE FROM anime_genre WHERE anime_id = ?
+                """;
+
+        String insertGenresSQL = """
+                INSERT INTO anime_genre (anime_id, genre_id)
+                VALUES (?, ?)
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(animeSql);
+             PreparedStatement ps2 = conn.prepareStatement(deleteGenresSQL);
+             PreparedStatement ps3 = conn.prepareStatement(insertGenresSQL)) {
+
+            // Edit anime
+            ps.setString(1, animeToEdit.title());
+            ps.setString(2, animeToEdit.synopsis());
+            ps.setDouble(3, animeToEdit.score());
+            ps.setString(4, animeToEdit.imageURL());
+            ps.setInt(5, animeToEdit.episodes());
+            ps.setString(6, animeToEdit.id());
+            ps.executeUpdate();
+
+            // Delete old genres
+            ps2.setString(1, animeToEdit.id());
+            ps2.executeUpdate();
+
+            // Insert new genres
+            for (Genre genre : animeToEdit.genres()) {
+                ps3.setString(1, animeToEdit.id());
+                ps3.setString(2, genre.id());
+                ps3.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        return;
+    }
+
+    public void deleteAnime(String id) {
+        String sql = """
+                DELETE FROM anime
+                WHERE id = ?
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, id);
+
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+                return;
+            }
+
+        return;
+    }
+
+    public void addAnime(AnimeToSave animeToSave) {
+        String animeSql = """
+                INSERT INTO anime (title, synopsis, score, link, episodes)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+
+        String getAnimeTitleSql = """
+                SELECT id
+                FROM anime
+                WHERE title = ?
+                """;
+
+        String insertGenresSQL = """
+                INSERT INTO anime_genre (anime_id, genre_id)
+                VALUES (?, ?)
+                """;
+
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement ps = conn.prepareStatement(animeSql);
+             Statement stmt = conn.createStatement();
+             PreparedStatement ps2 = conn.prepareStatement(insertGenresSQL)) {
+
+            // Add anime
+            ps.setString(1, animeToSave.title());
+            ps.setString(2, animeToSave.synopsis());
+            ps.setDouble(3, animeToSave.score());
+            ps.setString(4, animeToSave.imageURL());
+            ps.setInt(5, animeToSave.episodes());
+            ps.executeUpdate();
+
+            // Get anime id
+            ResultSet rs = stmt.executeQuery(getAnimeTitleSql);
+            String animeId;
+            if (rs.next()) {
+                animeId = rs.getString("id");
+            } else {
+                throw new RuntimeException("Problem with SQL fetching");
+            }
+
+            // Insert new genres
+            for (Genre genre : animeToSave.genres()) {
+                ps2.setString(1, animeId);
+                ps2.setString(2, genre.id());
+                ps2.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return;
         }
 
         return;

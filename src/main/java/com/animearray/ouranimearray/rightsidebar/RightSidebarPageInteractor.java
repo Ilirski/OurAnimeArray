@@ -17,6 +17,7 @@ public class RightSidebarPageInteractor {
         this.databaseFetcher = new DatabaseFetcher();
         createLoggedInBinding();
         createWatchStatusNotSetBinding();
+        createEditingBinding();
     }
 
     public void getUserAnimeData() {
@@ -63,6 +64,14 @@ public class RightSidebarPageInteractor {
         viewModel.genresProperty().addAll(genres);
     }
 
+    public void editAnime() {
+        databaseFetcher.editAnime(viewModel.getAnimeToCreateOrModify());
+    }
+
+    public void deleteAnime() {
+        databaseFetcher.deleteAnime(viewModel.getAnime().id());
+    }
+
     public void createLoggedInBinding() {
         viewModel.loggedInProperty().bind(viewModel.currentUserProperty().isNotNull());
     }
@@ -70,4 +79,13 @@ public class RightSidebarPageInteractor {
     public void createWatchStatusNotSetBinding() {
         viewModel.watchStatusNotSetProperty().bind(viewModel.userWatchStatusProperty().isNull());
     }
+
+    public void addAnime() {
+        databaseFetcher.addAnime(viewModel.getAnimeToCreateOrModify());
+    }
+
+    public void createEditingBinding() {
+        viewModel.editingProperty().bind(viewModel.adminRightSidebarVisibleProperty());
+    }
+
 }

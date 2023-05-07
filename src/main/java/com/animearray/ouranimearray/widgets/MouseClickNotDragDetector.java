@@ -28,7 +28,7 @@ public class MouseClickNotDragDetector {
             this.clear();
         });
 
-        this.pressedDurationThreshold = 200;
+        this.pressedDurationThreshold = 150;
     }
 
     static MouseClickNotDragDetector clickNotDragDetectingOn(Node node) {

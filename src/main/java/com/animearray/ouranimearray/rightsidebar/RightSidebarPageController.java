@@ -14,18 +14,22 @@ public class RightSidebarPageController implements ControllerFX {
     private final Builder<Region> viewBuilder;
 
     public RightSidebarPageController(AnimeProperty animeProperty, ObjectProperty<User> currentUserProperty,
-                                      BooleanProperty adminProperty, BooleanProperty rightSideBarVisibleProperty) {
+                                      BooleanProperty adminProperty, BooleanProperty rightSideBarVisibleProperty,
+                                      BooleanProperty editingProperty) {
         var model = new RightSidebarPageModel();
         interactor = new RightSidebarPageInteractor(model);
         viewBuilder = new RightSidebarPageViewBuilder(model, this::setAnimeStatus,
                 this::setEpisodeWatched, this::getUserAnimeData,
-                this::setUserScore, this::getGenres);
+                this::setUserScore, this::getGenres,
+                this::editAnime, this::deleteAnime,
+                this::addAnime);
 
         // Share model with other controllers
         model.currentUserProperty().bind(currentUserProperty);
         model.adminProperty().bind(adminProperty);
         model.animeProperty().bindBidirectional(animeProperty);
         model.rightSidebarVisibleProperty().bindBidirectional(rightSideBarVisibleProperty);
+        editingProperty.bind(model.editingProperty());
     }
 
     private void getUserAnimeData(Runnable postUserAnimeDataGet) {
@@ -103,6 +107,51 @@ public class RightSidebarPageController implements ControllerFX {
         fetchTask.setOnSucceeded(event -> {
             interactor.updateGenres();
             postGenresGet.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
+    public void editAnime(Runnable postAnimeEdit) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.editAnime();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            postAnimeEdit.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
+    public void deleteAnime(Runnable postAnimeDelete) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.deleteAnime();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            postAnimeDelete.run();
+        });
+        Thread fetchThread = new Thread(fetchTask);
+        fetchThread.start();
+    }
+
+    public void addAnime(Runnable postAnimeAdd) {
+        Task<Void> fetchTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.addAnime();
+                return null;
+            }
+        };
+        fetchTask.setOnSucceeded(event -> {
+            postAnimeAdd.run();
         });
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();

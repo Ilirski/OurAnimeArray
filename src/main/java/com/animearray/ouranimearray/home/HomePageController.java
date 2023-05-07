@@ -18,26 +18,39 @@ public class HomePageController implements ControllerFX {
         HomePageModel model = new HomePageModel();
         interactor = new HomePageInteractor(model);
         viewBuilder = new HomePageViewBuilder(model,
-                new SearchPageController(model.animeProperty(),
-                        model.rightSideBarVisibleProperty()).getViewBuilder(),
-                new LoginRegisterPageController(model.currentUserProperty(),
-                        model.searchPageSelectedProperty()).getViewBuilder(),
-                new ProfilePageController(model.currentUserProperty()).getViewBuilder(),
-                new RightSidebarPageController(model.animeProperty(),
-                        model.currentUserProperty(),
-                        model.adminProperty(),
-                        model.rightSideBarVisibleProperty()).getViewBuilder(),
-                new LeftSidebarPageController(model.currentUserProperty(),
-                        model.leftSideBarVisibleProperty(),
-                        model.listPageSelectedProperty(),
-                        model.listIdProperty()).getViewBuilder(),
-                new ListPageController(model.listPageSelectedProperty(),
+                new SearchPageController(
                         model.animeProperty(),
                         model.rightSideBarVisibleProperty(),
-                        model.listIdProperty()).getViewBuilder()
+                        model.adminProperty(),
+                        model.editingProperty()
+                ).getViewBuilder(),
+                new LoginRegisterPageController(
+                        model.currentUserProperty(),
+                        model.searchPageSelectedProperty()
+                ).getViewBuilder(),
+                new ProfilePageController(
+                        model.currentUserProperty()
+                ).getViewBuilder(),
+                new RightSidebarPageController(
+                        model.animeProperty(),
+                        model.currentUserProperty(),
+                        model.adminProperty(),
+                        model.rightSideBarVisibleProperty(),
+                        model.editingProperty()
+                ).getViewBuilder(),
+                new LeftSidebarPageController(
+                        model.currentUserProperty(),
+                        model.leftSideBarVisibleProperty(),
+                        model.listPageSelectedProperty(),
+                        model.listIdProperty()
+                ).getViewBuilder(),
+                new ListPageController(
+                        model.listPageSelectedProperty(),
+                        model.animeProperty(),
+                        model.rightSideBarVisibleProperty(),
+                        model.listIdProperty()
+                ).getViewBuilder()
         );
-
-        model.adminProperty().addListener(observable -> System.out.println("Admin: " + model.adminProperty().get()));
     }
 
     @Override

@@ -16,7 +16,8 @@ public class ListPageController implements ControllerFX {
                               BooleanProperty rightSideBarVisibleProperty, StringProperty listIdProperty) {
         var model = new ListPageModel();
         interactor = new ListPageInteractor(model);
-        viewBuilder = new ListPageViewBuilder(model, this::fetchAnimeList, this::fetchUserListDetails, this::removeAnimeFromList);
+        viewBuilder = new ListPageViewBuilder(model, this::fetchAnimeList, this::fetchUserListDetails,
+                this::removeAnimeFromList, this::editUserAnimeList);
 
         // Bind and share properties
         model.listPageSelectedProperty().bindBidirectional(listPageSelectedProperty);
@@ -63,7 +64,7 @@ public class ListPageController implements ControllerFX {
         fetchThread.start();
     }
 
-        public void removeAnimeFromList(Runnable postAnimeListRemove) {
+    public void removeAnimeFromList(Runnable postAnimeListRemove) {
         Task<Void> removeTask = new Task<>() {
             @Override
             protected Void call() {
@@ -77,6 +78,22 @@ public class ListPageController implements ControllerFX {
         Thread removeThread = new Thread(removeTask);
         removeThread.start();
     }
+
+    public void editUserAnimeList(Runnable postAnimeListEdit) {
+        Task<Void> editTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.editUserAnimeList();
+                return null;
+            }
+        };
+        editTask.setOnSucceeded(event -> {
+            postAnimeListEdit.run();
+        });
+        Thread editThread = new Thread(editTask);
+        editThread.start();
+    }
+
     @Override
     public Region getViewBuilder() {
         return viewBuilder.build();

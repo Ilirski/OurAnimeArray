@@ -1,0 +1,11 @@
+#list-name {
+    -fx-font: 30px "Arial";
+}
+
+#list-description {
+    -fx-font: 15px "Arial";
+}
+
+.mfx-font-icon {
+    -mfx-color: white;
+}

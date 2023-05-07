@@ -12,3 +12,16 @@
     -fx-text-fill: white;
     -fx-graphic-text-gap: 10;
 }
+
+.mfx-context-menu .mfx-scroll-pane {
+    -fx-background-color: #1d1d1d;
+    -fx-font-family: "Open Sans Regular";
+}
+
+.mfx-menu-item {
+    -fx-text-fill: white;
+}
+
+.mfx-menu-item .label {
+    -fx-text-fill: white;
+}

@@ -26,15 +26,14 @@ public class Main extends Application {
 
         // Styling
         scene.getStylesheets().addAll(
-        );
-
-        scene.getStylesheets().addAll(
-                getResourceUrl("stylesheet.css"),
+                getResourceUrl("homepage.css"),
                 getResourceUrl("tooltip.css"),
                 getResourceUrl("spinner.css"),
                 getResourceUrl("leftsidebar.css"),
                 getResourceUrl("rightsidebar.css"),
-                getResourceUrl("navbar.css")
+                getResourceUrl("navbar.css"),
+                getResourceUrl("listpage.css"),
+                getResourceUrl("dialogs.css")
         );
 
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icons/rimuru-thumbnail.jpg")).toString()));

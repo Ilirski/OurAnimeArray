@@ -19,7 +19,8 @@ public class LeftSidebarPageController implements ControllerFX {
                                      BooleanProperty listPageSelectedProperty, StringProperty listIdProperty) {
         var model = new LeftSidebarPageModel();
         interactor = new LeftSidebarPageInteractor(model);
-        viewBuilder = new LeftSidebarPageViewBuilder(model, this::fetchAnimeLists, this::addAnimeToList, this::createNewAnimeList);
+        viewBuilder = new LeftSidebarPageViewBuilder(model, this::fetchUserAnimeLists, this::addAnimeToList,
+                this::createNewAnimeList, this::deleteAnimeList);
 
         // Share the leftSideBarVisibleProperty with the model
         model.leftSideBarVisibleProperty().bind(leftSideBarVisibleProperty);
@@ -28,17 +29,17 @@ public class LeftSidebarPageController implements ControllerFX {
         model.listIdProperty().bindBidirectional(listIdProperty);
     }
 
-    private void fetchAnimeLists(Runnable postAnimeListFetch) {
+    private void fetchUserAnimeLists(Runnable postUserAnimeListsFetch) {
         Task<Void> fetchTask = new Task<>() {
             @Override
             protected Void call() {
-                interactor.loadAnimeList();
+                interactor.loadUserAnimeLists();
                 return null;
             }
         };
         fetchTask.setOnSucceeded(event -> {
             interactor.updateAnimeList();
-            postAnimeListFetch.run();
+            postUserAnimeListsFetch.run();
         });
         Thread fetchThread = new Thread(fetchTask);
         fetchThread.start();
@@ -80,6 +81,22 @@ public class LeftSidebarPageController implements ControllerFX {
         });
         Thread createThread = new Thread(createTask);
         createThread.start();
+    }
+
+    public void deleteAnimeList(Runnable postAnimeListDelete) {
+        Task<Void> deleteTask = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.deleteAnimeList();
+                return null;
+            }
+        };
+        deleteTask.setOnSucceeded(event -> {
+            interactor.updateNotification("List successfully deleted!");
+            postAnimeListDelete.run();
+        });
+        Thread deleteThread = new Thread(deleteTask);
+        deleteThread.start();
     }
 
     @Override

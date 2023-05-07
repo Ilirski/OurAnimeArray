@@ -2,6 +2,7 @@ package com.animearray.ouranimearray.search;
 
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.AnimeProperty;
+import com.animearray.ouranimearray.widgets.DAOs.SortType;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +13,45 @@ public class SearchPageModel {
     private final AnimeProperty anime = new AnimeProperty();
     private final BooleanProperty rightSideBarVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
+    private final ObjectProperty<SortType> sortType = new SimpleObjectProperty<>(SortType.SCORE);
+    private final BooleanProperty admin = new SimpleBooleanProperty(false);
+    private final BooleanProperty editing = new SimpleBooleanProperty(false);
+
+    public boolean isEditing() {
+        return editing.get();
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing.set(editing);
+    }
+
+    public BooleanProperty editingProperty() {
+        return editing;
+    }
+
+    public boolean isAdmin() {
+        return admin.get();
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin.set(admin);
+    }
+
+    public BooleanProperty adminProperty() {
+        return admin;
+    }
+
+    public SortType getSortType() {
+        return sortType.get();
+    }
+
+    public void setSortType(SortType sortType) {
+        this.sortType.set(sortType);
+    }
+
+    public ObjectProperty<SortType> sortTypeProperty() {
+        return sortType;
+    }
 
     public boolean isLoading() {
         return loading.get();

@@ -15,7 +15,7 @@ public class LeftSidebarPageInteractor {
         this.databaseFetcher = new DatabaseFetcher();
     }
 
-    public void loadAnimeList() {
+    public void loadUserAnimeLists() {
         animeListData = databaseFetcher.getAnimeLists(viewModel.getCurrentUser().id());
     }
 
@@ -34,6 +34,10 @@ public class LeftSidebarPageInteractor {
 
     public void createNewAnimeList() throws SQLException {
         databaseFetcher.createNewAnimeList(viewModel.getCurrentUser().id(), viewModel.getAnimeListNameToCreate());
+    }
+
+    public void deleteAnimeList() {
+        databaseFetcher.deleteAnimeList(viewModel.getListIdToDelete());
     }
 
     public void updateNotification(String notificationMessage) {

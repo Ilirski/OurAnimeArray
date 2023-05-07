@@ -12,9 +12,9 @@ class LeftSidebarPageInteractorTest {
     void loadAnimeList() {
         var model = new LeftSidebarPageModel();
         var interactor = new LeftSidebarPageInteractor(model);
-        model.setCurrentUser(new User("1", "Boccher", "Bocchi123", AccountType.USER));
-        interactor.loadAnimeList();
+        model.setCurrentUser(new User("1", "Boccher", "Bocchi123", AccountType.ADMIN));
+        interactor.loadUserAnimeLists();
         interactor.updateAnimeList();
-        assertEquals("1", model.getAnimeList().get(0).id());
+        assertEquals("1", model.getUserAnimeLists().get(0).id());
     }
 }

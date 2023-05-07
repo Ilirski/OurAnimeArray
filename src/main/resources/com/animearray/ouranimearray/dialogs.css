@@ -1,0 +1,46 @@
+.mfx-warn-dialog {
+    -fx-background-color: #1d1d1d;
+    -fx-border-color: #3f3f3f;
+}
+
+.mfx-warn-dialog .actions-pane {
+    -fx-background-color: transparent;
+}
+
+.mfx-dialog .content {
+    -fx-background-color: transparent;
+    -fx-font-family: "Open Sans Regular";
+    -fx-text-fill: black;
+}
+
+.mfx-dialog .mfx-font-icon {
+    -mfx-color: white;
+}
+
+.mfx-dialog .actions-pane .mfx-button {
+    -fx-background-color: #2967e3;
+}
+
+.mfx-dialog .content-container {
+    -fx-background-color: transparent;
+}
+
+.mfx-warn-dialog .header-label .mfx-font-icon {
+    -mfx-color: derive(-mfx-orange, 35%);
+}
+
+.mfx-warn-dialog .actions-pane .mfx-button {
+    -fx-text-fill: white;
+}
+
+.mfx-warn-dialog .actions-pane .mfx-button .mfx-ripple-generator {
+    -mfx-ripple-color: derive(-mfx-orange, 60%);
+}
+
+.mfx-warn-dialog .actions-pane .mfx-button:hover {
+    -fx-background-color: derive(#2966e1, 30%);
+}
+
+.mfx-dialog .label {
+    -fx-text-fill: white;
+}
