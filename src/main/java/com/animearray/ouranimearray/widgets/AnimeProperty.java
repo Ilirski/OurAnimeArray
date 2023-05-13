@@ -2,35 +2,86 @@ package com.animearray.ouranimearray.widgets;
 
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.DAOs.Genre;
+import com.animearray.ouranimearray.widgets.DAOs.Score;
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Binding;
-import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.scene.image.Image;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 public class AnimeProperty extends ObjectPropertyBase<Anime> {
-    String imageUnavailableUrl = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
-    private final Binding<String> id;
-    private final Binding<String> title;
-    private final Binding<Image> image;
-    private final Binding<Integer> episodes;
-    private final Binding<Double> score;
-    private final Binding<String> synopsis;
-    private final Binding<List<Genre>> genres;
+
+    private final StringProperty id;
+    private final StringProperty title;
+    private final ObjectProperty<Image> image;
+    private final ObjectProperty<Integer> episodes;
+    private final DoubleProperty score;
+    private final StringProperty synopsis;
+    private final ListProperty<Genre> genres;
+    private final ObjectProperty<LocalDate> airedStartDate;
+    private final ObjectProperty<LocalDate> airedEndDate;
+    private final String imageUnavailableUrl = "https://media.cheggcdn.com/media/d53/d535ce9a-4535-4e56-bd8e-81300a25a4f7/php4KwLCz";
 
     public AnimeProperty(Anime anime) {
         set(anime);
 
-        // If property is unavailable, set default
-        this.id = EasyBind.wrapNullable(this).map(Anime::id).orElse("ID Not Found");
-        this.title = EasyBind.wrapNullable(this).map(Anime::title).orElse("Title Not Found");
-        this.image = EasyBind.wrapNullable(this).map(Anime::image).orElse(new Image(imageUnavailableUrl));
-        this.episodes = EasyBind.wrapNullable(this).map(Anime::episodes).orElse(0);
-        this.score = EasyBind.wrapNullable(this).map(Anime::score).orElse(0.0);
-        this.synopsis = EasyBind.wrapNullable(this).map(Anime::synopsis).orElse("Synopsis Not Found");
-        this.genres = EasyBind.wrapNullable(this).map(Anime::genres).orElse(Collections.singletonList(new Genre(null, null)));
+        this.id = new SimpleStringProperty(anime != null ? anime.id() : "");
+        this.title = new SimpleStringProperty(anime != null ? anime.title() : "");
+        this.image = new SimpleObjectProperty<>(anime != null ? anime.image() : new Image(imageUnavailableUrl));
+        this.episodes = new SimpleObjectProperty<>(anime != null ? anime.episodes() : 0);
+        this.score = new SimpleDoubleProperty(anime != null ? anime.score() : 0.0);
+        this.synopsis = new SimpleStringProperty(anime != null ? anime.synopsis() : "");
+        this.genres = new SimpleListProperty<>(anime != null ? FXCollections.observableArrayList(anime.genres()) : FXCollections.singletonObservableList(new Genre(null, null)));
+        this.airedStartDate = new SimpleObjectProperty<>(anime != null ? anime.airedStartDate() : null);
+        this.airedEndDate = new SimpleObjectProperty<>(anime != null ? anime.airedEndDate() : null);
+
+        // Add a listener such that when the current AnimeProperty changes, its properties is updated
+        this.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                this.id.set(newValue.id());
+                this.title.set(newValue.title());
+                this.image.set(newValue.image());
+                this.episodes.set(newValue.episodes());
+                this.score.set(newValue.score());
+                this.synopsis.set(newValue.synopsis());
+                this.genres.set(FXCollections.observableArrayList(newValue.genres()));
+                this.airedStartDate.set(newValue.airedStartDate());
+                this.airedEndDate.set(newValue.airedEndDate());
+            } else {
+                this.id.set("");
+                this.title.set("");
+                this.image.set(new Image(imageUnavailableUrl));
+                this.episodes.set(0);
+                this.score.set(0.0);
+                this.synopsis.set("");
+                this.genres.set(FXCollections.singletonObservableList(new Genre(null, null)));
+                this.airedStartDate.set(null);
+                this.airedEndDate.set(null);
+            }
+        });
+
+    }
+
+        private void setDefaultValues() {
+            this.id.set("ID Not Found");
+            this.title.set("Title Not Found");
+            this.image.set(new Image(imageUnavailableUrl));
+            this.episodes.set(0);
+            this.score.set(0.0);
+            this.synopsis.set("Synopsis Not Found");
+            this.genres.set(FXCollections.singletonObservableList(new Genre(null, null)));
+            this.airedStartDate.set(null);
+            this.airedEndDate.set(null);
+        }
+
+
+    public AnimeProperty() {
+        this(null);
     }
 
     @Override
@@ -47,37 +98,40 @@ public class AnimeProperty extends ObjectPropertyBase<Anime> {
     public Anime get() {
         return super.get();
     }
-
-    public AnimeProperty() {
-        this(null);
-    }
-
-    public Binding<String> idBinding() {
+    public StringProperty idBinding() {
         return id;
     }
 
-    public Binding<String> titleBinding() {
+    public StringProperty titleBinding() {
         return title;
     }
 
-    public Binding<Image> imageBinding() {
+    public ObjectProperty<Image> imageBinding() {
         return image;
     }
 
-    public Binding<Integer> episodesBinding() {
+    public ObjectProperty<Integer> episodesBinding() {
         return episodes;
     }
 
-    public Binding<Double> scoreBinding() {
+    public DoubleProperty scoreBinding() {
         return score;
     }
 
-    public Binding<String> synopsisBinding() {
+    public StringProperty synopsisBinding() {
         return synopsis;
     }
 
-    public Binding<List<Genre>> genresBinding() {
+    public ListProperty<Genre> genresBinding() {
         return genres;
+    }
+
+    public ObjectProperty<LocalDate> airedStartDateBinding() {
+        return airedStartDate;
+    }
+
+    public ObjectProperty<LocalDate> airedEndDateBinding() {
+        return airedEndDate;
     }
 
     @Override

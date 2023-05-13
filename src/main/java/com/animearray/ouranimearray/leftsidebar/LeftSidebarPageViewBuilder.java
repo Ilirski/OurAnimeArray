@@ -1,16 +1,17 @@
 package com.animearray.ouranimearray.leftsidebar;
 
-import com.animearray.ouranimearray.widgets.DAOs.AnimeList;
 import com.animearray.ouranimearray.widgets.AnimeListCell;
+import com.animearray.ouranimearray.widgets.DAOs.AnimeList;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXListView;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.effects.DepthLevel;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.utils.others.FunctionalStringConverter;
-import javafx.geometry.Pos;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Builder;
 import javafx.util.StringConverter;
 import net.miginfocom.layout.CC;
@@ -73,10 +74,11 @@ public class LeftSidebarPageViewBuilder implements Builder<Region> {
         var notificationLabel = new Label();
         notificationLabel.textProperty().bindBidirectional(model.notificationProperty());
         notificationLabel.visibleProperty().bind(model.notificationProperty().isNotEmpty());
-        notificationLabel.setAlignment(Pos.CENTER);
+        notificationLabel.setTextAlignment(TextAlignment.CENTER);
+        notificationLabel.setWrapText(true);
 
         var addNewListButton = new MFXButton("Add");
-        addNewListButton.disableProperty().bind(model.animeListNameToCreateProperty().length().lessThan(5));
+        addNewListButton.disableProperty().bind(Bindings.createBooleanBinding(() -> model.getAnimeListNameToCreate().isBlank(), model.animeListNameToCreateProperty()));
         addNewListButton.setOnAction(event -> createNewAnimeList.accept(() -> fetchUserAnimeLists.accept(() -> model.setAnimeListNameToCreate(""))));
 
         addNewListPane.add(addNewAnimeListField, new CC().grow().wrap());

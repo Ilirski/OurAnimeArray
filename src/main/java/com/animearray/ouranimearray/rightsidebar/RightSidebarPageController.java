@@ -146,7 +146,7 @@ public class RightSidebarPageController implements ControllerFX {
         Task<Void> fetchTask = new Task<>() {
             @Override
             protected Void call() {
-                interactor.addAnime();
+                interactor.saveAnime();
                 return null;
             }
         };

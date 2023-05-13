@@ -2,7 +2,6 @@ package com.animearray.ouranimearray.search;
 
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.DAOs.SortType;
-import com.tobiasdiez.easybind.EasyBind;
 import io.github.palexdev.materialfx.beans.Alignment;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.font.FontResources;
@@ -55,12 +54,19 @@ public class SearchPageViewBuilder implements Builder<Region> {
                 model.rightSideBarVisibleProperty()
         );
 
+        model.animeProperty().addListener(observable -> {
+            if (model.animeProperty().get() == null) {
+                fetchAnimeList.accept(() -> {});
+            }
+        });
+
         // Create loading spinner
         MFXProgressSpinner loadingSpinner = new MFXProgressSpinner();
         MigPane loadingPane = new MigPane(new LC().fill());
         loadingPane.add(loadingSpinner, new CC().alignX("center").alignY("center").width("15%").height("15%"));
         loadingPane.visibleProperty().bind(model.loadingProperty());
 
+        // Create search bar, sort icon, and add new anime button
         MFXTextField searchBar = createSearchBar(model.searchQueryProperty(), model.loadingProperty(), fetchAnimeList);
         MFXFontIcon sortIcon = new MFXFontIcon(FontResources.FILTER_ALT.getDescription(), 32);
         MFXPopup popup = new MFXPopup();
@@ -73,7 +79,6 @@ public class SearchPageViewBuilder implements Builder<Region> {
             model.setRightSideBarVisible(true);
         });
         addNewAnimeButton.visibleProperty().bind(model.adminProperty());
-        model.adminProperty().addListener(observable -> System.out.println("Admin = " + model.adminProperty().get()));
 
         // Add search bar and anime grid view to grid pane
         animeGridPane.add(searchBar, new CC().width("50%").height("10").alignX("center").alignY("top").gap("0", "0", "5", "5").split(3));
@@ -96,8 +101,8 @@ public class SearchPageViewBuilder implements Builder<Region> {
         sortComboBox.getItems().addAll(SortType.values());
         sortComboBox.getSelectionModel().selectItem(SortType.SCORE);
         model.sortTypeProperty().bind(sortComboBox.selectedItemProperty());
+        // If sort type changes, fetch new anime list
         model.sortTypeProperty().addListener(observable -> {
-            System.out.println(sortComboBox.getSelectionModel().getSelectedItem() + " = " + model.sortTypeProperty().get());
             model.setLoading(true);
             fetchAnimeList.accept(() -> model.setLoading(false));
         });

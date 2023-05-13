@@ -15,6 +15,7 @@ import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -25,7 +26,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Builder;
 import javafx.util.StringConverter;
 import net.miginfocom.layout.AC;
@@ -33,6 +33,8 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import org.tbee.javafx.scene.layout.MigPane;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -96,6 +98,7 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 new AC().align("center")
         );
 
+        // Scroll pane
         var userScrollPane = new MFXScrollPane();
         userScrollPane.setFitToWidth(true);
         userScrollPane.setContent(innerPane);
@@ -125,11 +128,28 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
 
         // Genres
         Label animeGenres = new Label();
-
-        // Join list of genres
-        animeGenres.textProperty().bind(EasyBind.map(model.animeProperty().genresBinding(),
+        animeGenres.setTextAlignment(TextAlignment.CENTER);
+        animeGenres.textProperty().bind(EasyBind.map((ObservableValue<ObservableList<Genre>>) model.animeProperty().genresBinding(),
                 list -> list.stream().map(Genre::genre).collect(Collectors.joining(", "))));
+//        animeGenres.textProperty().bind(EasyBind.map(model.animeProperty().genresBinding(),
+//                list -> list.stream().map(Genre::genre).collect(Collectors.joining(", "))));
         animeGenres.setWrapText(true);
+
+        // Bind start and end dates together
+        Label animeAiredDates = new Label();
+        animeAiredDates.textProperty().bind(EasyBind.combine(model.animeProperty().airedStartDateBinding(),
+                model.animeProperty().airedEndDateBinding(), (startDate, endDate) -> {
+                    String parsedStartDate = parseDate(startDate);
+                    String parsedEndDate = parseDate(endDate);
+
+                    if (parsedStartDate.equals("Unknown") && parsedEndDate.equals("Unknown")) {
+                        return "Unknown";
+                    } else if (parsedEndDate.equals("Unknown")) {
+                        return parsedStartDate;
+                    } else {
+                        return parsedStartDate + " to " + parsedEndDate;
+                    }
+                }));
 
         // Status
         MFXComboBox<WatchStatus> statusComboBox = createWatchStatusComboBox();
@@ -174,7 +194,8 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
 
         // Synopsis
         Label animeSynopsis = new Label();
-        animeSynopsis.textProperty().bind(model.animeProperty().synopsisBinding());
+        animeSynopsis.textProperty().bind(EasyBind.map(model.animeProperty().synopsisBinding(),
+                synopsis -> synopsis.isBlank() ? "No synopsis found" : synopsis));
         animeSynopsis.setTextAlignment(TextAlignment.JUSTIFY);
         animeSynopsis.setWrapText(true);
 
@@ -185,24 +206,35 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         MFXButton editButton = createEditButton();
 
         // Add to inner pane
-        innerPane.add(animePoster, new CC().wrap());
+        innerPane.add(animePoster, new CC().wrap().pushX());
         innerPane.add(animeTitle, new CC().wrap());
         innerPane.add(animeEpisodes, new CC().split(2));
         innerPane.add(animeScore, new CC().wrap());
         innerPane.add(animeGenres, new CC().wrap());
-        innerPane.add(statusComboBox, new CC().wrap().hideMode(3));
-        innerPane.add(episodesWatchedSpinner, new CC().wrap().hideMode(3));
-        innerPane.add(scoreComboBox, new CC().wrap().hideMode(3));
+        innerPane.add(animeAiredDates, new CC().wrap());
+        innerPane.add(statusComboBox, new CC().wrap().hideMode(2).width("60%"));
+        innerPane.add(episodesWatchedSpinner, new CC().wrap().hideMode(2).width("90%"));
+        innerPane.add(scoreComboBox, new CC().wrap().hideMode(2).width("60%"));
         innerPane.add(animeSynopsis, new CC().wrap());
 
         // Add to right sidebar
-        rightSidebar.add(userScrollPane, new CC().grow().push().wrap());
+        rightSidebar.add(userScrollPane, new CC().grow().push().wrap().alignX("center").alignY("top"));
         rightSidebar.add(exitButton, new CC().split(2));
         rightSidebar.add(editButton, new CC().hideMode(3));
 
         rightSidebar.visibleProperty().bindBidirectional(model.userRightSidebarVisibleProperty());
 
         return rightSidebar;
+    }
+
+    private String parseDate(LocalDate date) {
+        String parsedDate;
+        try {
+            parsedDate = date.format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
+        } catch (Exception e) {
+            parsedDate = "Unknown";
+        }
+        return parsedDate;
     }
 
     private Region createAdminRightSidebar() {
@@ -217,6 +249,7 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                 new AC().align("left")
         );
 
+        // Scroll pane
         var adminScrollPane = new MFXScrollPane();
         adminScrollPane.setFitToWidth(true);
         adminScrollPane.setContent(adminInnerPane);
@@ -233,6 +266,14 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         var synopsisField = new ExpandingTextArea();
         synopsisField.setPromptText("Synopsis");
         var genresTagsField = new GenreTagsField();
+
+        var airedStartDateField = new MFXDatePicker();
+        airedStartDateField.setPromptText("Aired Start Date");
+        airedStartDateField.setEditable(false);
+
+        var airedEndDateField = new MFXDatePicker();
+        airedEndDateField.setPromptText("Aired End Date");
+        airedStartDateField.setEditable(false);
 
         // Get genres from model
         model.adminRightSidebarVisibleProperty().addListener(observable ->
@@ -251,11 +292,15 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
             // Set fields in edit sidebar
             idField.setText(model.getAnime().id());
             titleField.setText(model.getAnime().title());
+            titleField.requestFocus();
             // Check if image is null
             imageURLField.setText(model.getAnime().image() == null ? "" : model.getAnime().image().getUrl());
             episodesField.setText(String.valueOf(model.getAnime().episodes()));
             scoreField.setText(String.valueOf(model.getAnime().score()));
             synopsisField.setText(model.getAnime().synopsis());
+            airedStartDateField.setValue(model.getAnime().airedStartDate());
+            airedEndDateField.setValue(model.getAnime().airedEndDate());
+
             // Add genres
             ObservableList<Genre> genres = FXCollections.observableArrayList(model.getAnime().genres());
             genresTagsField.clearTags();
@@ -284,6 +329,11 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                     .setScrimOwner(true)
                     .get();
 
+            confirmDialogContent.setOnClose(event -> {
+                confirmDialog.close();
+                rightSidebar.setDisable(false);
+            });
+
             MFXButton saveChangesButton = new MFXButton("Save changes");
             saveChangesButton.setOnAction(event -> {
                 confirmDialogContent.setHeaderText("Save changes?");
@@ -295,22 +345,98 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
             MFXButton cancelChangesButton = getCancelButton();
             cancelChangesButton.setOnAction(event -> {
                 confirmDialogContent.setHeaderText("Cancel changes?");
-                confirmDialogContent.setContentText("Are you sure you want to cancel these changes?");
-                confirmDialog.show();
-                rightSidebar.setDisable(true);
+                confirmDialogContent.setContentText("Are you sure you want to cancel? All changes will be lost.");
+
+                if (Objects.equals(model.getAnime(), new Anime())) {
+                    model.setAdminRightSidebarVisible(false);
+                    model.setUserRightSidebarVisible(true);
+                    model.setRightSidebarVisible(false);
+                }
+
+                // Check if any fields have been changed
+                if (isAnimeFieldChanged(idField, titleField, imageURLField, episodesField, scoreField, synopsisField, genresTagsField, airedStartDateField, airedEndDateField)) {
+                    confirmDialog.show();
+                    rightSidebar.setDisable(true);
+                } else {
+                    // Hide sidebar
+                    model.setAdminRightSidebarVisible(false);
+                    model.setUserRightSidebarVisible(true);
+                }
             });
 
             MFXButton deleteChangesButton = new MFXButton("Delete");
             deleteChangesButton.setOnAction(event -> {
                 confirmDialogContent.setHeaderText("Delete anime?");
-                confirmDialogContent.setContentText("Are you sure you want to delete this anime?");
+                confirmDialogContent.setContentText("Are you sure you want to delete this anime? This action cannot be undone.");
                 confirmDialog.show();
                 rightSidebar.setDisable(true);
-                deleteAnime.accept(() -> {});
             });
+
+            // If adding new anime, disable delete button
+            deleteChangesButton.visibleProperty().bind(EasyBind.wrap(model.animeProperty()).map(anime -> {
+                if (anime == null) {
+                    return false;
+                }
+                return !anime.id().equals("Not set");
+            }));
 
             confirmDialogContent.addActions(
                     Map.entry(new MFXButton("Confirm"), event -> {
+                        // Get values from fields
+                        var animeId = idField.getText();
+                        var title = titleField.getText();
+                        var imageURL = imageURLField.getText();
+                        var episodes = episodesField.getText();
+                        var score = scoreField.getText();
+                        List<Genre> genres = genresTagsField.getTags();
+                        var synopsis = synopsisField.getText();
+                        var airedStartDate = airedStartDateField.getValue();
+                        var airedEndDate = airedEndDateField.getValue();
+                        var animeToSave = new AnimeToSave(animeId, title, imageURL, Integer.parseInt(episodes),
+                                Double.parseDouble(score), synopsis, genres, airedStartDate, airedEndDate);
+                        var action = confirmDialogContent.getHeaderText();
+                        switch (action) {
+                            case "Save changes?" -> {
+                                // Set anime to save in model
+                                model.setAnimeToCreateOrModify(animeToSave);
+                                model.setSavingAnime(true);
+                                if (Objects.equals(model.getAnime().id(), "Not set")) {
+                                    addAnime.accept(() -> {
+                                        model.setAnime(null);
+                                        model.setSavingAnime(false);
+                                        model.setAdminRightSidebarVisible(false);
+                                        model.setUserRightSidebarVisible(true);
+                                        model.setRightSidebarVisible(false);
+                                    });
+                                } else {
+                                    editAnime.accept(() -> {
+                                        model.setAnime(null);
+                                        model.setSavingAnime(false);
+                                        model.setAdminRightSidebarVisible(false);
+                                        model.setUserRightSidebarVisible(true);
+                                        model.setRightSidebarVisible(false);
+                                    });
+                                }
+                            }
+                            case "Cancel changes?" -> {
+                                model.setAnimeToCreateOrModify(null);
+                                model.setSavingAnime(false);
+                                model.setAdminRightSidebarVisible(false);
+                                model.setUserRightSidebarVisible(true);
+                                model.setRightSidebarVisible(false);
+                            }
+                            case "Delete anime?" -> {
+                                model.setAnimeToCreateOrModify(animeToSave);
+                                model.setSavingAnime(true);
+                                deleteAnime.accept(() -> {
+                                    model.setAnime(null);
+                                    model.setSavingAnime(false);
+                                    model.setAdminRightSidebarVisible(false);
+                                    model.setUserRightSidebarVisible(true);
+                                    model.setRightSidebarVisible(false);
+                                });
+                            }
+                        }
                         confirmDialog.close();
                         rightSidebar.setDisable(false);
                     }),
@@ -319,30 +445,6 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
                         rightSidebar.setDisable(false);
                     })
             );
-
-            MFXButton confirmButton = new MFXButton("Confirm");
-            MFXButton cancelButton = new MFXButton("Cancel");
-
-
-//                // Get values from fields
-//                var animeId = idField.getText();
-//                var title = titleField.getText();
-//                var imageURL = imageURLField.getText();
-//                var episodes = episodesField.getText();
-//                var score = scoreField.getText();
-//                List<Genre> genres = genresTagsField.getTags();
-//                var synopsis = synopsisField.getText();
-//                var animeToSave = new AnimeToSave(animeId, title, imageURL, Integer.parseInt(episodes), Double.parseDouble(score), synopsis, genres);
-//
-//                // Set anime to save in model
-//                model.setAnimeToCreateOrModify(animeToSave);
-//                model.setSavingAnime(true);
-//                if (Objects.equals(model.getAnime().id(), "Not set")) {
-//                    addAnime.accept(() -> model.setSavingAnime(false));
-//                } else {
-//                    editAnime.accept(() -> model.setSavingAnime(false));
-//                }
-//            });
 
             // Disable save button if any of the fields are invalid or anime is being saved
             saveChangesButton.disableProperty().bind(
@@ -356,9 +458,8 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
             rightSidebar.add(adminInnerPane, new CC().grow().push().wrap());
             rightSidebar.add(saveChangesButton, new CC().split(3));
             rightSidebar.add(deleteChangesButton);
-            rightSidebar.add(cancelButton);
+            rightSidebar.add(cancelChangesButton);
         });
-
 
         adminInnerPane.add(idField, new CC().wrap().growX().pushX());
         adminInnerPane.add(titleField, new CC().wrap().growX().pushX());
@@ -366,11 +467,26 @@ public class RightSidebarPageViewBuilder implements Builder<Region> {
         adminInnerPane.add(episodesField, new CC().wrap().growX().pushX());
         adminInnerPane.add(scoreField, new CC().wrap().growX().pushX());
         adminInnerPane.add(genresTagsField, new CC().wrap().growX().pushX());
+        adminInnerPane.add(airedStartDateField, new CC().wrap().growX().pushX());
+        adminInnerPane.add(airedEndDateField, new CC().wrap().growX().pushX());
         adminInnerPane.add(synopsisField, new CC().wrap().growX().pushX());
-
 
         rightSidebar.visibleProperty().bindBidirectional(model.adminRightSidebarVisibleProperty());
         return rightSidebar;
+    }
+
+    private boolean isAnimeFieldChanged(MFXTextField idField, MFXTextField titleField, ExpandingTextArea imageURLField,
+                                        MFXTextField episodesField, MFXTextField scoreField, ExpandingTextArea synopsisField,
+                                        GenreTagsField genresTagsField, MFXDatePicker airedStartDateField, MFXDatePicker airedEndDateField) {
+        Anime anime = model.getAnime();
+        return anime != null && (!anime.id().equals(idField.getText()) || !anime.title().equals(titleField.getText())
+                || (anime.image() != null && !anime.image().getUrl().equals(imageURLField.getText()))
+                || anime.episodes() != Integer.parseInt(episodesField.getText())
+                || anime.score() != Double.parseDouble(scoreField.getText())
+                || !anime.synopsis().equals(synopsisField.getText())
+                || !anime.genres().equals(genresTagsField.getTags())
+                || !Objects.equals(anime.airedStartDate(), airedStartDateField.getValue())
+                || !Objects.equals(anime.airedEndDate(), airedEndDateField.getValue()));
     }
 
     private MFXButton createEditButton() {

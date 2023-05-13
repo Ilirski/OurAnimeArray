@@ -40,6 +40,7 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         loginRegisterPane.add(loginPane, new CC().hideMode(3));
         loginRegisterPane.add(registerPane, new CC().hideMode(3));
+        loginRegisterPane.setId("login-register-pane");
 
         return loginRegisterPane;
     }
@@ -72,13 +73,15 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
     private MigPane setupLoginPane(Consumer<Runnable> userFetcher) {
         MigPane loginPane = createMigPaneWithCenteredAlignment();
 
+        var logoLabel = new Label("OurAnimeArray");
+        logoLabel.getStyleClass().add("logo");
         var validationLabel = createValidationLabel(model.loginErrorMessageProperty());
         var usernameField = createUsernameField(model.usernameLoginProperty());
         var passwordField = createPasswordField(model.passwordLoginProperty());
 
         MFXButton loginButton = createLoginButton(usernameField, passwordField, userFetcher);
 
-        addLoginPaneComponents(loginPane, usernameField, passwordField, loginButton, validationLabel);
+        addPaneComponents(loginPane, logoLabel, usernameField, passwordField, loginButton, validationLabel);
 
         return loginPane;
     }
@@ -122,16 +125,11 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
         return loginButton;
     }
 
-    private void addLoginPaneComponents(MigPane loginPane, MFXTextField usernameField, MFXPasswordField passwordField, MFXButton loginButton, Label validationLabel) {
-        loginPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
-        loginPane.add(passwordField, new CC().sizeGroup("login").grow());
-        loginPane.add(loginButton, new CC().grow());
-        loginPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center").hideMode(3));
-    }
-
     private MigPane setupRegisterPane(Consumer<Runnable> userFetcher) {
         MigPane registerPane = createMigPaneWithCenteredAlignment();
 
+        var logoLabel = new Label("OurAnimeArray");
+        logoLabel.getStyleClass().add("logo");
         var validationLabel = createValidationLabel(model.registerErrorMessageProperty());
         var usernameField = createRegisterUsernameField();
         usernameField.textProperty().bindBidirectional(model.usernameRegisterProperty());
@@ -143,7 +141,7 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         var registerButton = createRegisterButton(usernameField, passwordField, userFetcher);
 
-        addRegisterPaneComponents(registerPane, usernameField, passwordField, registerButton, validationLabel);
+        addPaneComponents(registerPane, logoLabel, usernameField, passwordField, registerButton, validationLabel);
 
         return registerPane;
     }
@@ -163,16 +161,20 @@ public class LoginRegisterPageViewBuilder implements Builder<Region> {
 
         registerButton.setOnAction(event -> {
             isFetchingUser.set(true);
-            userFetcher.accept(() -> isFetchingUser.set(false));
+            userFetcher.accept(() -> {
+                isFetchingUser.set(false);
+            });
         });
 
         return registerButton;
     }
 
-    private void addRegisterPaneComponents(MigPane registerPane, MFXTextField usernameField, MFXPasswordField passwordField, MFXButton registerButton, Label validationLabel) {
-        registerPane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
-        registerPane.add(passwordField, new CC().sizeGroup("login").grow());
-        registerPane.add(registerButton, new CC().grow());
-        registerPane.add(validationLabel, new CC().maxWidth("100mm").alignX("center").hideMode(3));
+    private void addPaneComponents(MigPane pane, Label logoLabel, MFXTextField usernameField, MFXPasswordField passwordField, MFXButton registerButton, Label validationLabel) {
+        logoLabel.setStyle("-fx-font-size: 50px");
+        pane.add(logoLabel, new CC().alignX("center").wrap().gapBottom("20mm"));
+        pane.add(usernameField, new CC().sizeGroup("login").grow().width("100mm"));
+        pane.add(passwordField, new CC().sizeGroup("login").grow());
+        pane.add(registerButton, new CC().grow());
+        pane.add(validationLabel, new CC().maxWidth("100mm").alignX("center").hideMode(3));
     }
 }

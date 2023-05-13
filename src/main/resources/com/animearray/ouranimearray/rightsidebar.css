@@ -89,5 +89,21 @@
     -fx-background-color: #3f3f3f;
 }
 
+.right-sidebar .mfx-text-field .text-field {
+    -fx-prompt-text-fill: darkgray;
+}
+
+.right-sidebar .mfx-date-picker .date-picker-popup .months-combo .virtual-flow .mfx-combo-box-cell:selected,
+.right-sidebar .mfx-date-picker .date-picker-popup .years-combo .virtual-flow .mfx-combo-box-cell:selected {
+    -fx-background-color: #2967e3;
+}
 
 
+.right-sidebar .mfx-date-cell:current {
+    -fx-text-fill: #2967e3;
+    -fx-background-color: #F7F6F9;
+}
+
+.right-sidebar .mfx-date-cell:selected {
+    -fx-background-color: #2967e3;
+}

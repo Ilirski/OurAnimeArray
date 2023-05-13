@@ -1,6 +1,5 @@
 package com.animearray.ouranimearray.widgets;
 
-import animatefx.animation.GlowBackground;
 import animatefx.animation.Tada;
 import com.animearray.ouranimearray.widgets.DAOs.Anime;
 import com.animearray.ouranimearray.widgets.DAOs.AnimeList;
@@ -14,12 +13,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Cursor;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.util.Duration;
+import javafx.scene.input.MouseButton;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 // This class is used to render the cells of the list view
@@ -50,17 +46,12 @@ public class AnimeListCell extends MFXListCell<AnimeList> {
             getScene().setCursor(Cursor.OPEN_HAND);
             this.setStyle("-fx-background-color: #2966e1; -fx-border-color: #c0bdbd;");
             new Tada(this).play();
-//            new GlowBackground(this, Color.WHITE, Color.YELLOW, 20)
-//                    .setDelay(Duration.millis(50))
-//                    .setCycleCount(3)
-//                    .setResetOnFinished(true)
-//                    .play();
         });
 
         setOnMouseDragExited(event -> this.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;"));
 
         setOnMouseClicked(event -> {
-            if (!event.isSecondaryButtonDown()) {
+            if (event.getButton() != null && event.getButton() != MouseButton.SECONDARY) {
                 listId.set(data.id());
                 listPageSelected.set(true);
             }
@@ -68,12 +59,15 @@ public class AnimeListCell extends MFXListCell<AnimeList> {
 
         MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
                 .setText("Delete")
+                .setIcon(new MFXFontIcon(FontResources.DELETE.getDescription(), 20))
                 .setOnAction(event -> {
                     listIdToDelete.set(data.id());
                     deleteAnimeList.accept(() -> {
-                        System.out.println("Deleting anime list: " + data.id());
                         listIdToDelete.set(null);
                         fetchUserAnimeList.accept(() -> {
+                            // Select the first list
+                            listId.set(Objects.requireNonNull(listView.getItems().stream().findFirst().orElse(null)).id());
+                            listPageSelected.set(true);
                         });
                     });
                 })

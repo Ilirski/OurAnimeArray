@@ -24,7 +24,7 @@ public class LeftSidebarPageInteractor {
         viewModel.animeWatchListProperty().addAll(animeListData);
     }
 
-    public void addAnimeToList() {
+    public void addAnimeToList() throws SQLException {
         databaseFetcher.addAnimeToList(viewModel.getAnimeToAdd().id(), viewModel.getAnimeListToAddTo().id());
 
         // Clear the animeToAdd and animeListToAddTo properties

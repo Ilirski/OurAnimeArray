@@ -17,7 +17,7 @@ public class LeftSidebarPageModel {
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
     private final StringProperty listId = new SimpleStringProperty();
     private final StringProperty listIdToDelete = new SimpleStringProperty();
-    private final StringProperty animeListNameToCreate = new SimpleStringProperty();
+    private final StringProperty animeListNameToCreate = new SimpleStringProperty("");
     private final StringProperty notification = new SimpleStringProperty();
 
     public String getListIdToDelete() {

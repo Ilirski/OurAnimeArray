@@ -15,11 +15,24 @@ public class HomePageModel {
     private final BooleanProperty loginRegisterPageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty profilePageSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty listPageSelected = new SimpleBooleanProperty(false);
+    private final BooleanProperty reportPageSelected = new SimpleBooleanProperty(false);
     private final StringProperty listId = new SimpleStringProperty();
     private final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
     private final BooleanBinding loggedIn = EasyBind.wrapNullable(currentUser).isPresent();
     private final BooleanProperty admin = new SimpleBooleanProperty(false);
     private final BooleanProperty editing = new SimpleBooleanProperty(false);
+
+    public boolean isReportPageSelected() {
+        return reportPageSelected.get();
+    }
+
+    public void setReportPageSelected(boolean reportPageSelected) {
+        this.reportPageSelected.set(reportPageSelected);
+    }
+
+    public BooleanProperty reportPageSelectedProperty() {
+        return reportPageSelected;
+    }
 
     public boolean isEditing() {
         return editing.get();

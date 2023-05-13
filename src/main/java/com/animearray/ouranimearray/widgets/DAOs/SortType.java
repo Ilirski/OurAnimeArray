@@ -4,7 +4,8 @@ public enum SortType {
     POPULARITY("Popularity"),
     SCORE("Score"),
     TITLE("Title"),
-    NEWEST("Newly Added");
+    NEWEST("Newly Added"),
+    RECENT("Recently Aired");
 
     private final String sortType;
 

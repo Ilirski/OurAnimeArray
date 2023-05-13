@@ -48,14 +48,22 @@ public class LeftSidebarPageController implements ControllerFX {
     private void addAnimeToList(Runnable postAnimeListAdd) {
         Task<Void> addTask = new Task<>() {
             @Override
-            protected Void call() {
+            protected Void call() throws SQLException {
                 interactor.addAnimeToList();
                 return null;
             }
         };
         addTask.setOnSucceeded(event -> {
             interactor.updateAnimeList();
+            interactor.updateNotification("Anime successfully added to list!");
             postAnimeListAdd.run();
+        });
+        addTask.setOnFailed(event -> {
+            SQLException sqlException = (SQLException) addTask.getException();
+            System.out.println(sqlException.getErrorCode() + " " + sqlException.getMessage());
+            if (sqlException.getErrorCode() == 19) {
+                interactor.updateNotification("ERROR: Anime already exists in list.");
+            }
         });
         Thread addThread = new Thread(addTask);
         addThread.start();
@@ -75,6 +83,7 @@ public class LeftSidebarPageController implements ControllerFX {
         });
         createTask.setOnFailed(event -> {
             SQLException sqlException = (SQLException) createTask.getException();
+            System.out.println(sqlException.getErrorCode() + " " + sqlException.getMessage());
             if (sqlException.getErrorCode() == 19) {
                 interactor.updateNotification("ERROR: List name already exists.");
             }

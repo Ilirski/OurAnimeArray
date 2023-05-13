@@ -4,6 +4,7 @@ import com.animearray.ouranimearray.leftsidebar.LeftSidebarPageController;
 import com.animearray.ouranimearray.list.ListPageController;
 import com.animearray.ouranimearray.loginregister.LoginRegisterPageController;
 import com.animearray.ouranimearray.profile.ProfilePageController;
+import com.animearray.ouranimearray.report.ReportPageController;
 import com.animearray.ouranimearray.rightsidebar.RightSidebarPageController;
 import com.animearray.ouranimearray.search.SearchPageController;
 import com.animearray.ouranimearray.widgets.ControllerFX;
@@ -49,7 +50,8 @@ public class HomePageController implements ControllerFX {
                         model.animeProperty(),
                         model.rightSideBarVisibleProperty(),
                         model.listIdProperty()
-                ).getViewBuilder()
+                ).getViewBuilder(),
+                new ReportPageController().getViewBuilder()
         );
     }
 

@@ -36,11 +36,10 @@ public class LoginRegisterPageController implements ControllerFX {
             if (!model.isLoggedIn()) {
                 interactor.updateLoginErrorMessage("ERROR: Username or password is incorrect.");
             } else {
-                // If user is logged in, switch to search page
-                searchPageSelectedProperty.set(true);
-                // And clear the login fields
+                // clear the login fields
                 model.setUsernameLogin("");
                 model.setPasswordLogin("");
+                interactor.updateLoginErrorMessage("");
             }
             postFetchUsers.run();
         });
@@ -58,6 +57,9 @@ public class LoginRegisterPageController implements ControllerFX {
         };
         fetchTask.setOnSucceeded(event -> {
             interactor.updateRegisterErrorMessage("Account successfully created!");
+            model.setUsernameRegister("");
+            model.setPasswordRegister("");
+            interactor.updateRegisterErrorMessage("");
             postFetchUsers.run();
         });
         fetchTask.setOnFailed(event -> {

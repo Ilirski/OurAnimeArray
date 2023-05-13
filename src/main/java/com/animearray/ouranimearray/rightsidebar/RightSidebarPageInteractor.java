@@ -80,8 +80,8 @@ public class RightSidebarPageInteractor {
         viewModel.watchStatusNotSetProperty().bind(viewModel.userWatchStatusProperty().isNull());
     }
 
-    public void addAnime() {
-        databaseFetcher.addAnime(viewModel.getAnimeToCreateOrModify());
+    public void saveAnime() {
+        databaseFetcher.saveAnime(viewModel.getAnimeToCreateOrModify());
     }
 
     public void createEditingBinding() {

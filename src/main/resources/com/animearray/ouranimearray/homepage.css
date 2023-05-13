@@ -144,7 +144,6 @@
 }
 
 .home-page #search-bar {
-    /* make rounded */
     -fx-background-radius: 20;
     /*-fx-background-color: #1d1d1d;*/
     -fx-border-radius: 20;
@@ -181,4 +180,50 @@
 .mfx-combo-box .combo-popup .virtual-flow {
     -fx-background-color: #3f3f3f;
     -fx-border-color: #313030;
+}
+
+.logo {
+    -fx-font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 2px;
+}
+
+.chart-legend-item{
+    -fx-text-fill: #191970;
+}
+
+.axis {
+    -fx-tick-label-fill: white;
+    -fx-tick-label-font: 12px 'Visby Round CF Demi Bold';
+}
+
+.chart-legend {
+    -fx-background-color: #1d1d1d;
+}
+
+.mfx-filter-combo-box .combo-popup .search-container {
+    -fx-background-color: #1d1d1d;
+    -fx-border-color: #313030;
+}
+
+.mfx-filter-combo-box .combo-popup .search-field .text-field {
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: lightgray;
+}
+
+.mfx-slider {
+    -mfx-main-color: #2966e1;
+    -mfx-main-color-hover: rgba(41, 102, 225, 0.1);
+    -mfx-main-color-pressed: rgba(41, 102, 225, 0.3);
+    -mfx-disabled-color: rgb(158, 158, 158);
+}
+
+.mfx-slider .bar {
+    -fx-fill: #2966e1;
+}
+
+#popupContent {
+    -fx-background-color: #1d1d1d;
 }
